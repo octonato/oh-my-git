@@ -1,0 +1,20 @@
+#!/bin/sh
+
+  REPO=$1
+  PROJ=${REPO#*/}
+  DIR=${PROJ%*.git}
+  git clone $REPO
+  
+  echo "Moving into $DIR"
+  cd $DIR
+  CURRENT_BRANCH=`git-current-branch`
+  cd ../
+
+  echo "Preparing branch: '$CURRENT_BRANCH'"
+  git-prepare $DIR $CURRENT_BRANCH
+
+  echo "Moving to $DIR/$CURRENT_BRANCH"
+  cd $DIR/$CURRENT_BRANCH
+
+  echo "Forking..."
+  git fork --remote-name=origin

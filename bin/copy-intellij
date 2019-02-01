@@ -1,0 +1,18 @@
+#!/bin/sh
+
+REPO=$1
+NAME=$2
+
+echo "name=$NAME"
+echo "repo=$REPO"
+
+# copy IntelliJ files
+if [ -d ../${REPO}/.idea ]; then
+    cp -r ../${REPO}/.idea .
+    echo $NAME > .idea/.name
+    elif [ -d ../${REPO}/framework/.idea ]
+    then
+        echo "special case for playframework" 
+    cp -r ../${REPO}/framework/.idea framework/
+    echo $NAME > framework/.idea/.name
+fi

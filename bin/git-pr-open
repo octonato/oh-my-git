@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -f .prinfo ]; then
+    (
+        source .prinfo
+        open $PR_URL
+    ) 
+else
+  echo "No .prinfo on that branch"
+fi

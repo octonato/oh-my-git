@@ -1,0 +1,2 @@
+#!/bin/sh
+git branch | grep '*' | sed 's/^.\{2\}//g'

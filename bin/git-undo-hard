@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ $1 ] ; then
+    (
+        unset HISTFILE
+        git reset --hard HEAD~"$1"
+    )
+else
+    echo "A HEAD~{num} must be provided"
+fi

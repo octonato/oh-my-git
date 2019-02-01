@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "pulling from ustream $(git-current-branch)..."
+git pull upstream `git-current-branch`

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# checkpick from a commit on current branch 
+# and optionally push it to another branch
+# Usage:
+# git backport 24555fd
+# or
+# git backport 24555fd 3.2.x
+
+git fetch
+git cherry-pick $1
+if [ $2 ]; then
+  git push $2
+fi

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [ -d "$1" ]; then
+    cd $1
+
+    if [ -d .git ]; then
+
+        echo "Deleting branch '$(git-current-branch)' on origin"
+        git push --delete origin `git-current-branch`
+
+        # delete that folder
+        DIR_TO_DELETE=`pwd`
+        
+        echo "Deleting dir '$DIR_TO_DELETE'"
+        rm -rf $DIR_TO_DELETE
+    else 
+        echo "Not a git repository"
+    fi 
+fi
