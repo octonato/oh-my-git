@@ -1,12 +1,11 @@
 #!/bin/sh
 
-git-push-origin
-
-if [ $1 ]; then
-    PR_URL=$(git pull-request -b $1)
-else
-    PR_URL=$(git pull-request)
+if [ -f .prinfo ]; then
+  rm .prinfo
 fi
+
+git-push-origin
+PR_URL=$(hub pull-request $@)
 
 PATH_URL=`echo ${PR_URL#*https://github.com/} | sed  's/\/pull\//\/pulls\//g'`
 PR_API_URL="https://api.github.com/repos/$PATH_URL" 
@@ -14,9 +13,6 @@ PR_API_URL="https://api.github.com/repos/$PATH_URL"
 echo "PR URL: $PR_URL"
 echo "PR API URL: $PR_API_URL"
 
-if [ -f .prinfo ]; then
-  rm .prinfo
-fi
 
 echo "PR_API_URL=$PR_API_URL" >> .prinfo
 echo "PR_URL=$PR_URL" >> .prinfo

@@ -6,11 +6,7 @@ if [ -f .prinfo ]; then
     source .prinfo
 
     # call rest api
-    STATE=`curl $PR_API_URL | jq '.state'`
-    MERGED=`curl $PR_API_URL | jq '.merged'`
-
-    echo "Status: $STATE"
-    echo "Merged: $MERGED"
+    curl -s $PR_API_URL |  jq '{state, merged}'
     
 else
     echo "No .prinfo file found"

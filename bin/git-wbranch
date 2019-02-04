@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# create a working branch, similar to `git worktree`
+# but works by creating a local clone 
+
 if [ -d .git ]; then
   git-pull-upstream
     
