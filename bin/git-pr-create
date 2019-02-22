@@ -4,11 +4,11 @@ if [ -f .prinfo ]; then
   rm .prinfo
 fi
 
-git-push-origin
+git-push-fork
 PR_URL=$(hub pull-request $@)
 
 PATH_URL=`echo ${PR_URL#*https://github.com/} | sed  's/\/pull\//\/pulls\//g'`
-PR_API_URL="https://api.github.com/repos/$PATH_URL" 
+PR_API_URL="https://api.github.com/repos/$PATH_URL"
 
 echo "PR URL: $PR_URL"
 echo "PR API URL: $PR_API_URL"

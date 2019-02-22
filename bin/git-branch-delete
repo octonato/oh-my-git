@@ -1,34 +1,36 @@
 #!/bin/sh
 
+. remote-aliases
+
 function _delete_force {
   if [ -d .git ]; then
-    echo "Deleting branch '$(git-current-branch)' on origin"
-    git push --delete origin `git-current-branch`
+    echo "Deleting branch '$(git-current-branch)' on $FORK_ALIAS"
+    git push --delete $FORK_ALIAS `git-current-branch`
 
     # delete that folder
     DIR_TO_DELETE=`pwd`
 
     echo "Deleting dir '$DIR_TO_DELETE'"
     rm -rf $DIR_TO_DELETE
-  else 
+  else
     echo "Not a git repository"
-  fi 
+  fi
 }
 
 if [ -d "$1" ]; then
     cd $1
     if [ -f .prinfo ]; then
-        PR_STATE=`git-is-merged` 
-        
+        PR_STATE=`git-is-merged`
+
         if [ "$PR_STATE" = "true" ]; then
             _delete_force $1
-        else 
+        else
             source .prinfo
             echo "This branch $i has an open and unmerged PR"
             echo "Check it at $PR_URL"
             echo "To force deletion, first remove $1/.prinfo filecall"
-        fi 
+        fi
     else
         _delete_force $1
-    fi     
-fi 
+    fi
+fi

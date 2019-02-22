@@ -4,7 +4,7 @@
   PROJ=${REPO#*/}
   DIR=${PROJ%*.git}
   git clone $REPO
-  
+
   echo "Moving into $DIR"
   cd $DIR
   CURRENT_BRANCH=`git-current-branch`
@@ -17,4 +17,4 @@
   cd $DIR/$CURRENT_BRANCH
 
   echo "Forking..."
-  git fork --remote-name=origin
+  git fork --remote-name=$FORK_ALIAS

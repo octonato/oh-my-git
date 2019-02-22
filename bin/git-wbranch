@@ -1,30 +1,30 @@
 #!/bin/sh
 
 # create a working branch, similar to `git worktree`
-# but works by creating a local clone 
+# but works by creating a local clone
 
 if [ -d .git ]; then
   git-pull-upstream
-    
+
   REPO=${PWD##*/}
 
   # save remote urls for later
   UPSTREAM_REMOTE_URL=`git remote get-url upstream`
-  ORIGIN_REMOTE_URL=`git remote get-url origin`
+  FORK_REMOTE_URL=`git remote get-url $FORK_ALIAS`
 
   cd ../
   git clone ${REPO} $1
   cd $1
 
-  # local points to origin (original local checkout)
-  git remote add local `git remote get-url origin`
+  # local points to $FORK_ALIAS (original local checkout)
+  git remote add local `git remote get-url $FORK_ALIAS`
 
-  # remove origin and read point to remove
-  git remote remove origin
-  git remote add origin $ORIGIN_REMOTE_URL
+  # remove current $FORK_ALIAS and read point to remote
+  git remote remove $FORK_ALIAS
+  git remote add $FORK_ALIAS $FORK_REMOTE_URL
 
   # add upstream pointing to remote
-  git remote add upstream $UPSTREAM_REMOTE_URL
+  git remote add upstream $FORK_REMOTE_URL
 
   # check it out using new branch
   git checkout -b $1
