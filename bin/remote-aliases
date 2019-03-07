@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# There are two conventions for remote aliases which require the `oh-my-git`
+# to be parameterised.
+
+
+# FORK_ALIAS should be set to the alias of your fork. This is either
+# `origin` or your <github-username>.
+export FORK_ALIAS=origin
+
+
+# UPSTREAM_ALIAS should be set to the alias of the repository you are
+# sending PR's to. This is usually `upstream` or `origin`.
+export UPSTREAM_ALIAS=upstream

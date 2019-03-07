@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git push --set-upstream $FORK_ALIAS `git-current-branch`
