@@ -1,20 +1,22 @@
 #!/bin/sh
 
-  REPO=$1
-  PROJ=${REPO#*/}
-  DIR=${PROJ%*.git}
-  git clone $REPO
+. remote-aliases
 
-  echo "Moving into $DIR"
-  cd $DIR
-  CURRENT_BRANCH=`git-current-branch`
-  cd ../
+REPO=$1
+PROJ=${REPO#*/}
+DIR=${PROJ%*.git}
+git clone $REPO
 
-  echo "Preparing branch: '$CURRENT_BRANCH'"
-  git-prepare $DIR $CURRENT_BRANCH
+echo "Moving into $DIR"
+cd $DIR
+CURRENT_BRANCH=`git-current-branch`
+cd ../
 
-  echo "Moving to $DIR/$CURRENT_BRANCH"
-  cd $DIR/$CURRENT_BRANCH
+echo "Preparing branch: '$CURRENT_BRANCH'"
+git-prepare $DIR $CURRENT_BRANCH
 
-  echo "Forking..."
-  git fork --remote-name=$FORK_ALIAS
+echo "Moving to $DIR/$CURRENT_BRANCH"
+cd $DIR/$CURRENT_BRANCH
+
+echo "Forking..."
+git fork --remote-name=$FORK_ALIAS
