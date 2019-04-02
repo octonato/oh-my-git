@@ -1,14 +1,56 @@
 #!/bin/sh
 
-# checkpick from a commit on current branch 
+# cherry-pick from a commit on current branch 
 # and optionally push it to another branch
-# Usage:
-# git backport 24555fd
-# or
-# git backport 24555fd 3.2.x
+#
+# Usage: $0 --from <branch-to-cherry-pick from> [--push <branch-to-push-to>]
+# Any other arguments will be passed over to git cherry-pick
+#
+usage() {
+    echo "Usage: git backport --from <remote-to-cherry-pick-from> [--push <branch-to-push-to>]"
+    echo "Any other arguments will be passed over to git cherry-pick"
 
-git fetch
-git cherry-pick $1
-if [ $2 ]; then
-  git push $2
+    echo "EXAMPLES"
+    echo "  git backport --from upstream --push maintenance-branch 532baa3"
+    echo "    cherry-pick commig 532baa3 from remote 'upstream' and push it to 'maintenance-branch'"
+    echo
+
+    echo "  git backport --from upstream 532baa3"
+    echo "    cherry-pick commig 532baa3 from remote 'upstream'"
+    
+    exit $1
+}
+
+while [[ $# -gt 0 ]]
+do
+    case $1 in
+        --push)
+            PUSH_TO=$2
+            shift
+            ;;
+        --from)
+            FROM_REMOTE=$2
+            shift
+            ;;
+        -h|--help)
+            usage 0
+            ;;
+        *)
+            RESIDUAL_ARGS+=("$1")
+            ;;
+    esac
+    shift
+done
+
+
+git pull $FROM_REMOTE 
+
+if [ $FROM_REMOTE ]; then
+  git fetch $FROM_REMOTE
+fi
+
+git cherry-pick ${RESIDUAL_ARGS[@]}
+
+if [ $PUSH_TO ]; then
+  git push $FROM_REMOTE $PUSH_TO
 fi

@@ -17,4 +17,4 @@
   cd $DIR/$CURRENT_BRANCH
 
   echo "Forking..."
-  git fork --remote-name=origin
+  hub fork --remote-name=origin

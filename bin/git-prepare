@@ -5,7 +5,7 @@ mkdir ${1}_tmp
 if [ $2 ]; then
   mv ${1} ${1}_tmp/$2
 else
-    mv ${1} ${1}_tmp/`git-current-branch`
+  mv ${1} ${1}_tmp/`git-current-branch`
 fi
 
 mv ${1}_tmp ${1}

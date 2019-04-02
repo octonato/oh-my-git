@@ -1,5 +1,0 @@
-#!/bin/sh
-
-git-wbranch "PR-$1"
-cd ../"PR-$1"
-hub pr checkout $1
