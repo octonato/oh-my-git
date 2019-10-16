@@ -17,6 +17,22 @@ function gh.org {
 
 }
 
+function edit.current() {
+  while [[ $# -gt 0 ]]
+  do
+    case $1 in
+      -e|--edit)
+        shift
+        edit .
+        ;;
+
+      -i|--intellij)
+          shift
+          ij 
+          ;;
+    esac
+  done
+}
 function gh() {
 
   function usage.gh() {
@@ -54,7 +70,7 @@ function gh() {
                   shift
                   (
                     cd $PROJ_DIR
-                    ij .
+                    ij
                   )
                   ;;
 
@@ -63,15 +79,16 @@ function gh() {
                   BRANCH_NAME=$1; shift
                   cd $PROJ_DIR
                   workbranch $BRANCH_NAME
+                  edit.current $@
                   ;;
 
-              -pco|--pr-checkout)
+              -pr |--pr-checkout)
                   shift
                   PR_NUMBER=$1; shift
                   cd $PROJ_DIR
                   pr.checkout $PR_NUMBER
-                  ;;
-
+                  edit.current $@
+                  ;; 
 
               -s|--status)
                   shift
@@ -97,13 +114,20 @@ function gh() {
                     cd $PROJ_DIR
                     git.branch.delete .
                   )
-                  ;;
+                  ;;                  
 
               -D|--force-delete)
                   shift
                   (
                     cd $PROJ_DIR
                     git.branch.delete.force .
+                  )
+                  ;;
+
+              -r|--remove)
+                  shift
+                  (
+                    rm -rf $PROJ_DIR
                   )
                   ;;
 
@@ -123,6 +147,10 @@ function gh() {
               -h|--help)
                   shift
                   usage.gh
+                  ;;
+              *)
+                  echo "Sorry, I don't understand '$1'"
+                  shift
                   ;;
                   
           esac
