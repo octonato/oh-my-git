@@ -1,0 +1,30 @@
+# These settings are synced to GitHub by https://probot.github.io/apps/settings/.
+repository:
+  topics: github, hacking, bash
+  private: false
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: false
+  default_branch: master
+  allow_squash_merge: true
+  allow_merge_commit: false
+
+branches:
+  - name: "*"
+    protection:
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: true
+
+labels:
+  - color: f9d0c4
+    name: "closed:declined"
+  - color: f9d0c4
+    name: "closed:duplicated"
+  - color: f9d0c4
+    name: "closed:invalid"
+  - color: f9d0c4
+    name: "closed:question"
+  - color: f9d0c4
+    name: "closed:wontfix"
