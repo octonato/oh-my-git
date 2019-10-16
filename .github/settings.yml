@@ -1,5 +1,6 @@
 # These settings are synced to GitHub by https://probot.github.io/apps/settings/.
 repository:
+  name: oh-my-git
   topics: github, hacking, bash
   private: false
   has_issues: true
