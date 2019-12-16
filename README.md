@@ -1,3 +1,5 @@
+# Oh-my-git
+
 A collection of git scripts that I use to automate my workflow
 
 ## Requirements
@@ -11,7 +13,7 @@ Some commands requires extra libraries, namely `hub` and `jq`.
 
 ### Check out this repo
 
-```
+```bash
 git clone git@github.com:renatocaval/oh-my-git.git
 ```
 
@@ -19,7 +21,6 @@ git clone git@github.com:renatocaval/oh-my-git.git
 * source `git-functions.sh` and `gh-functions.sh`
 * define env variable: `GITHUB_SRC` (eg: GITHUB_SRC=/Users/renato)
 * define env variable: `GITHUB_USER` (eg: GITHUB_USER=renatocaval)
-
 
 ### pr.new
 
