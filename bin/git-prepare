@@ -5,7 +5,8 @@ mkdir ${1}_tmp
 if [ $2 ]; then
   mv ${1} ${1}_tmp/$2
 else
-  mv ${1} ${1}_tmp/`git-current-branch`
+  BRANCH=`(cd ${1} && git-current-branch)`
+  mv ${1} ${1}_tmp/$BRANCH
 fi
 
 mv ${1}_tmp ${1}

@@ -157,7 +157,7 @@ function git.branch.delete {
 }
 
 alias pr.list='hub pr list'
-
+alias gfu='git fetch upstream'
 
 function pr.checkout {
   git.workbranch "PR-$1"
@@ -166,3 +166,20 @@ function pr.checkout {
 
 alias backport='git backport'
 alias workbranch='git.workbranch'
+
+alias gamd='git commit -v -a --no-edit --amend'
+alias glogf='git log --decorate --graph'
+alias glu='git pull-upstream'
+alias gpo='git push-origin'
+
+function gpof {
+  echo "Are you sure you want to do a forced push? (y,N)"
+  read confirm
+
+  if [ "$confirm" = "y" ]; then
+    git push-origin --force
+  else 
+    echo "Yeah, better so!"
+  fi
+  
+}
