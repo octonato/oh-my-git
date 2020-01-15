@@ -166,6 +166,7 @@ function pr.checkout {
 
 alias backport='git backport'
 alias workbranch='git.workbranch'
+alias wb='git.workbranch'
 
 alias gamd='git commit -v -a --no-edit --amend'
 alias glogf='git log --decorate --graph'
