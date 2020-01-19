@@ -1,0 +1,70 @@
+#!/bin/sh
+
+usage() {
+    echo "Usage: oh-my-git <command>"
+    echo "Any other arguments will be passed over to actual commant"
+    echo 
+    echo "Provided alias: (misc)"
+    echo "   pr.list      hub pr list"
+    echo "   pr.checkout  hub pr checkout"
+    echo "   gfu          git fetch upstream "
+    echo "   backport     git backport"
+    echo "   workbranch   git.workbranch"
+    echo "   wb           git.workbranch"
+    echo "   gamd         git commit -v -a --no-edit --amend"
+    echo "   glogf        git log --decorate --graph "
+    echo "   glu          git pull-upstream"
+    echo "   gpo          git push-origin "
+    echo "   gpof         git push-origin --force"
+    echo 
+    echo "Provided functions: (Git)"
+    echo "   gc.pr                    Add all, commit with <message> and create a PR"
+    echo "   git.rebase.interactive   Run an interactive rebase with the last <num> commits"
+    echo "   git.workbranch           Create a local clone and and prepare a branch"
+    echo "   git.branch.delete        Delete 'origin' and local copies of a branch if it was a PR and it is 'merged'"
+    echo "   git.branch.delete.force  Forcefuly delete 'origin' and local copies of a branch"
+    echo 
+    echo "Provided functions: (GitHub)"
+    echo "   gh             ????"
+    echo "   edit.current   ????"
+    echo "   gh.org         ????"
+    echo 
+    echo "Provided functions: (hub)"
+    echo "   pr.open         Open a browser to the PR for the current repo and the provided <PR-id>"
+    echo "   pr.status       Print a status summary (merged, state, CI) for the givern <PR-id>"
+    echo "   pr.merged       Print wether the PR <PR-id> is already merged"
+    echo "   pr.new          Create and submit a new PR (only works if $EDITOR is E-macs or VSCode"
+    echo 
+    echo "Git extensions:"
+    echo "   backport        Backports cherry-picked commits between the specified barnches"
+    echo "   clone-fork      Forks and prepares a working copy of the provided repo"
+    echo "   current-branch  Echoes the active branch in the working repo"
+    echo "   prepare         ????"
+    echo "   pull-upstream   Pulls the current branch from 'upstream'"
+    echo "   push-origin     Pushes the current branch to 'origin'"
+    echo "   recent          Print a nice summary of the recent commits (a convenient git log)"
+    echo "   undo            Soft resets the branch <num> commits"
+    echo "   undo-hard       Hard resets the branch <num> commits"
+    echo 
+    echo "Provided functions: (misc)"
+    echo "   copy-ide-settings     Duplicates IntelliJ settings from another workspace"
+    echo 
+    exit $1
+}
+
+if [[ $# -eq 0 ]]; then
+    usage 0
+fi
+
+while [[ $# -gt 0 ]]
+do
+    case $1 in
+        -h|--help)
+            usage 0
+            ;;
+        *)
+            RESIDUAL_ARGS+=("$1")
+            ;;
+    esac
+    shift
+done

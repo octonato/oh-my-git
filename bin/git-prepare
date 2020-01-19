@@ -1,5 +1,17 @@
 #!/bin/sh
 
+usage() {
+    echo "Usage: git prepare <source-repo> [new-branch]"
+    echo ""
+    echo "Given a repo and (optionally) a branch, prepare a new local working copy for that branch."
+    exit $1
+}
+
+if [[ $# -eq 0 ]]; then
+    echo "Missing required argument <source-repo>"
+    usage 0
+fi
+
 mkdir ${1}_tmp
 
 if [ $2 ]; then

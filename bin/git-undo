@@ -1,5 +1,24 @@
 #!/bin/sh
 
+usage() {
+    COMMIT_SUMMARY_LENGTH=12
+    echo 
+    echo "Usage: git undo <number-of-commits>"
+    echo "Resets <number-of-commits> from 'HEAD' in the working copy."
+    echo 
+    echo "Here's a summary of the latest $COMMIT_SUMMARY_LENGTH commits:"
+    echo 
+    ## Not sure what format of log to use...
+    #git log -"$COMMIT_SUMMARY_LENGTH" --pretty=format:"%h - %an, %ar : %s"
+    git recent $COMMIT_SUMMARY_LENGTH
+    echo 
+    exit $1
+}
+
+if [[ $# -ne 1 ]]; then
+    usage 1
+fi
+
 if [ $1 ] ; then
     (
         unset HISTFILE

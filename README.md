@@ -8,6 +8,7 @@ Some commands requires extra libraries, namely `hub` and `jq`.
 
 * `hub`  - https://hub.github.com/
 * `jq` - https://stedolan.github.io/jq/
+* `complete` (a default function in bash)
 
 ## Install
 
@@ -21,6 +22,16 @@ git clone git@github.com:renatocaval/oh-my-git.git
 * source `git-functions.sh` and `gh-functions.sh`
 * define env variable: `GITHUB_SRC` (eg: GITHUB_SRC=/Users/renato)
 * define env variable: `GITHUB_USER` (eg: GITHUB_USER=renatocaval)
+
+## Usage
+
+Use the command 
+
+```bash
+oh-my-git
+```
+
+to print the list of commands, alias, git extensions and git alias provided.
 
 ### pr.new
 
