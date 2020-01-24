@@ -33,7 +33,7 @@ usage() {
     echo "   pr.open         Open a browser to the PR for the current repo and the provided <PR-id>"
     echo "   pr.status       Print a status summary (merged, state, CI) for the givern <PR-id>"
     echo "   pr.merged       Print wether the PR <PR-id> is already merged"
-    echo "   pr.new          Create and submit a new PR (only works if $EDITOR is E-macs or VSCode"
+    echo "   pr.new          Create and submit a new PR (only works if $EDITOR is E-macs or VSCode)"
     echo 
     echo "Git extensions:"
     echo "   backport        Backports cherry-picked commits between the specified barnches"
