@@ -1,9 +1,11 @@
 
-function git.rebase.interative {
+function git.rebase.interactive {
     if [ $1 ] ; then
         git rebase -i HEAD~"$1"
     else
         echo "A HEAD~{num} must be provided"
+        echo
+        git recent
     fi
 }
 
@@ -43,7 +45,7 @@ function git.workbranch {
           copy-ide-settings ${REPO} $1          
           cd ../$1
         else 
-          echo "branch name must be passed, usage: git wbranch some-name"
+          echo "branch name must be passed, usage: git workbranch some-name"
         fi
     else
       echo "Not a git repository"
