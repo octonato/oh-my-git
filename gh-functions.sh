@@ -1,17 +1,17 @@
-function gh.org {
+function ghp.org {
   # if we got a project folder, we just use it. 
   if [ $2 ] && [ -d $GITHUB_SRC/$1/$2 ]; then
     # drop ORG and PROJ and pass the rest
     PROJ_MASTER=$1/$2; shift; shift
-    gh $PROJ_MASTER $@ # $@ minus $1 and $2
+    ghp $PROJ_MASTER $@ # $@ minus $1 and $2
   else
     # $1 + $2 don't make a project, try org/master
     ORG=$1; shift
     PROJ_MASTER=$ORG/$ORG/master
     if [[ -d $GITHUB_SRC/$PROJ_MASTER ]]; then
-      gh $PROJ_MASTER $@ # $@ minus $1
+      ghp $PROJ_MASTER $@ # $@ minus $1
     else 
-      gh $ORG $@ # $@ minus $1
+      ghp $ORG $@ # $@ minus $1
     fi
   fi
 
@@ -33,9 +33,9 @@ function edit.current() {
     esac
   done
 }
-function gh() {
+function ghp() {
 
-  function usage.gh() {
+  function usage.ghp() {
     echo "TODO: usage"
   }
   
@@ -146,7 +146,7 @@ function gh() {
 
               -h|--help)
                   shift
-                  usage.gh
+                  usage.ghp
                   ;;
               *)
                   echo "Sorry, I don't understand '$1'"
@@ -161,8 +161,8 @@ function gh() {
 }
 
 
-# same as _gh_completions but starting at org level
-_gh_completions_org ()   {       
+# same as _ghp_completions but starting at org level
+_ghp_completions_org ()   {       
   
   SRC_ROOT=$GITHUB_SRC/$1
   #            list all projecst    | cut out root         | cut leading chars  | cut out trailing /
@@ -176,7 +176,7 @@ _gh_completions_org ()   {
   return 0
 }
 
-_gh_completions ()   {       
+_ghp_completions ()   {       
   #            list all projecst        | cut out root           | cut leading chars  | cut out trailing /
   GH_PROJECTS=`ls -d $GITHUB_SRC/*/*/*/ | cut -c ${#GITHUB_SRC}- | cut -c 3-          | sed 's/\/$//'`
 
@@ -188,4 +188,4 @@ _gh_completions ()   {
   return 0
 }
 
-complete -F _gh_completions -o plusdirs gh 
+complete -F _ghp_completions -o plusdirs ghp

@@ -25,9 +25,9 @@ usage() {
     echo "   git.branch.delete.force  Forcefuly delete 'origin' and local copies of a branch"
     echo 
     echo "Provided functions: (GitHub)"
-    echo "   gh             ????"
+    echo "   ghp            ????"
     echo "   edit.current   ????"
-    echo "   gh.org         ????"
+    echo "   ghp.org        ????"
     echo 
     echo "Provided functions: (hub)"
     echo "   pr.open         Open a browser to the PR for the current repo and the provided <PR-id>"
