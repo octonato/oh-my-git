@@ -33,6 +33,16 @@ oh-my-git
 
 to print the list of commands, alias, git extensions and git alias provided.
 
+### git clone-fork
+
+Quickly clone and fork a git repository. 
+
+```
+git clone-fork git@github.com:lagom/lagom.git
+```
+
+**Note** only the `SSH` protocol (not `HTTPS`) is supported.
+
 ### pr.new
 
 The commant `pr.new` doesn't work if your git editor is set to `vim`. 
