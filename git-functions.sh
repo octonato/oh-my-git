@@ -126,9 +126,13 @@ function pr.new {
 }
 
 function gc.pr {
+  git commit $@
+  pr.new -m $@
+}
+
+function gca.pr {
   git add .
-  git commit -m $1
-  pr.new -m $1
+  gc.pr $@
 }
 
 function git.branch.delete.force {
