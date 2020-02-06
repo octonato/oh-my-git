@@ -25,13 +25,40 @@ git clone git@github.com:renatocaval/oh-my-git.git
 
 ## Usage
 
-Use the command 
+Use `oh-my-git` to print the list of commands, alias, git extensions and git alias provided.
 
-```bash
-oh-my-git
+### Folder Structure
+
+Some of the commands provided by `oh-my-git` expect your local clone to follow a certain folder structure:
+
+```
+$GITHUB_SRC
+├── some-github-org
+│   └── fancy-repo
+│       └── master
+├── another-org
+│   ├── repo1
+│   │   └── master
+│   └── repo1
+│       ├── bugfix-branch
+│       └── master
+└── renatocaval
+    └── oh-my-git
+        ├── master
+        └── more-usage-docs
+
 ```
 
-to print the list of commands, alias, git extensions and git alias provided.
+
+### ghp
+
+If you followed the convention described in [Folder Structure](#Folder-Structure) you can use `ghp <TABx2>` to quickly navigate to a workbranch on your local clones useing autocompletion of the organization, repository and branch names:
+
+```bash
+$ ghp rena<TAB>/oh-<TAB>/ 
+renatocaval/oh-my-git/doc-usage           renatocaval/oh-my-git/master
+renatocaval/oh-my-git/more-usage-docs
+```
 
 ### git clone-fork
 
