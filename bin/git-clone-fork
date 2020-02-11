@@ -3,7 +3,7 @@
   REPO=$1
   PROJ=${REPO#*/}
   DIR=${PROJ%*.git}
-  git clone $REPO
+  git clone -o upstream $REPO
   
   echo "Moving into $DIR"
   cd $DIR
