@@ -193,7 +193,7 @@ function gpof {
 }
 
 function gpuf {
-  echo "Are you sure you want to do a forced push? (y,N)"
+  echo "Are you really sure you want to do a forced push upstream? (y,N)"
   read confirm
 
   if [ "$confirm" = "y" ]; then
