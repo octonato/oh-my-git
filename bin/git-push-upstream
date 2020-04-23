@@ -1,0 +1,3 @@
+#!/bin/sh
+
+git push --set-upstream upstream `git-current-branch` $@

@@ -178,13 +178,26 @@ alias gamd='git commit -v -a --no-edit --amend'
 alias glogf='git log --decorate --graph'
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
+alias gpu='git push-upstream'
 
 function gpof {
-  echo "Are you sure you want to do a forced push? (y,N)"
+  echo "Are you really sure you want to do a forced push on origin? (y,N)"
   read confirm
 
   if [ "$confirm" = "y" ]; then
     git push-origin --force
+  else 
+    echo "Yeah, better so!"
+  fi
+  
+}
+
+function gpuf {
+  echo "Are you really sure you want to do a forced push upstream? (y,N)"
+  read confirm
+
+  if [ "$confirm" = "y" ]; then
+    git push-upstream --force
   else 
     echo "Yeah, better so!"
   fi
