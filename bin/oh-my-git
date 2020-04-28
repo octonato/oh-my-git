@@ -14,6 +14,7 @@ usage() {
     echo "   gamd         git commit -v -a --no-edit --amend"
     echo "   glogf        git log --decorate --graph "
     echo "   glu          git pull-upstream"
+    echo "   gpu          git push-upstream "
     echo "   gpo          git push-origin "
     echo "   gpof         git push-origin --force"
     echo 
@@ -41,6 +42,7 @@ usage() {
     echo "   current-branch  Echoes the active branch in the working repo"
     echo "   prepare         ????"
     echo "   pull-upstream   Pulls the current branch from 'upstream'"
+    echo "   push-upstream   Pushes the current branch to 'upstream'"
     echo "   push-origin     Pushes the current branch to 'origin'"
     echo "   recent          Print a nice summary of the recent commits (a convenient git log)"
     echo "   undo            Soft resets the branch <num> commits"
