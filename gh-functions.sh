@@ -65,6 +65,14 @@ function ghp() {
                     edit .
                   )
                   ;;
+              -c|--command)
+                  shift
+                  (
+                    cd $PROJ_DIR
+                    ${@}
+                  )
+                  shift $#
+                  ;;                  
 
               -i|--intellij)
                   shift
