@@ -9,10 +9,20 @@ function git.rebase.interactive {
     fi
 }
 
+alias gri=git.rebase.interactive
+
+function git.wipbranch {
+  if [ -d .git ]; then
+      if [ $1 ]; then 
+          git checkout -b ${GH_USER_PREFIX}${1}
+      fi
+  fi
+}
 
 # create a working branch, similar to `git worktree`
-# but works by creating a local clone 
-
+# but works by creating a local clone. 
+# If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch, 
+# eg: GH_USER_PREFIX=wip- results in wip-{chosen-branch-name}
 function git.workbranch {
     if [ -d .git ]; then
       if [ $1 ]; then 
@@ -39,7 +49,7 @@ function git.workbranch {
           git remote add upstream $UPSTREAM_REMOTE_URL
 
           # check it out using new branch
-          git checkout -b $1
+          git checkout -b ${GH_USER_PREFIX}${1}
 
           # copy ide settings
           copy-ide-settings ${REPO} $1          
@@ -126,7 +136,7 @@ function pr.new {
 }
 
 function gc.pr {
-  git commit $@
+  git commit -m $@
   pr.new -m $@
 }
 
@@ -173,6 +183,7 @@ function pr.checkout {
 alias backport='git backport'
 alias workbranch='git.workbranch'
 alias wb='git.workbranch'
+alias wip='git.wipbranch'
 
 alias gamd='git commit -v -a --no-edit --amend'
 alias glogf='git log --decorate --graph'
@@ -202,4 +213,9 @@ function gpuf {
     echo "Yeah, better so!"
   fi
   
+}
+
+function grum {
+  git fetch upstream
+  git rebase upstream/master
 }

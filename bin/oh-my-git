@@ -20,7 +20,7 @@ usage() {
     echo "Provided functions: (Git)"
     echo "   gc.pr                    Add all, commit with <message> and create a PR"
     echo "   git.rebase.interactive   Run an interactive rebase with the last <num> commits"
-    echo "   git.workbranch           Create a local clone and and prepare a branch"
+    echo "   git.workbranch           Create a local clone and and prepare a branch. Branch name can be prefixed with env var GH_USER_PREFIX"
     echo "   git.branch.delete        Delete 'origin' and local copies of a branch if it was a PR and it is 'merged'"
     echo "   git.branch.delete.force  Forcefuly delete 'origin' and local copies of a branch"
     echo 
