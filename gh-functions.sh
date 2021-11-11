@@ -127,6 +127,7 @@ function ghp() {
               -r|--remove)
                   shift
                   (
+                    echo "Removing $PROJ_DIR"
                     rm -rf $PROJ_DIR
                   )
                   ;;
