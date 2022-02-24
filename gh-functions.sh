@@ -86,7 +86,7 @@ function ghp() {
                   shift
                   BRANCH_NAME=$1; shift
                   cd $PROJ_DIR
-                  workbranch $BRANCH_NAME
+                  git.workbranch $BRANCH_NAME
                   edit.current $@
                   ;;
 

@@ -181,7 +181,6 @@ function pr.checkout {
 }
 
 alias backport='git backport'
-alias workbranch='git.workbranch'
 alias wb='git.workbranch'
 alias wip='git.wipbranch'
 

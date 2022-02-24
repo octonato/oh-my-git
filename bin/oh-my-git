@@ -9,7 +9,6 @@ usage() {
     echo "   pr.checkout  hub pr checkout"
     echo "   gfu          git fetch upstream "
     echo "   backport     git backport"
-    echo "   workbranch   git.workbranch"
     echo "   wb           git.workbranch"
     echo "   gamd         git commit -v --no-edit --amend"
     echo "   glogf        git log --decorate --graph "
