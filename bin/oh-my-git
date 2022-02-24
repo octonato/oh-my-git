@@ -11,7 +11,7 @@ usage() {
     echo "   backport     git backport"
     echo "   workbranch   git.workbranch"
     echo "   wb           git.workbranch"
-    echo "   gamd         git commit -v -a --no-edit --amend"
+    echo "   gamd         git commit -v --no-edit --amend"
     echo "   glogf        git log --decorate --graph "
     echo "   glu          git pull-upstream"
     echo "   gpo          git push-origin "

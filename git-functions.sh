@@ -185,11 +185,14 @@ alias workbranch='git.workbranch'
 alias wb='git.workbranch'
 alias wip='git.wipbranch'
 
-alias gamd='git commit -v -a --no-edit --amend'
+alias gs='git status'
+alias gamd='git commit -v --no-edit --amend'
 alias glogf='git log --decorate --graph'
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
 alias gpu='git push-upstream'
+alias gwip='ga . && gc -m wip'
+
 
 function gpof {
   echo "Are you really sure you want to do a forced push on origin? (y,N)"
