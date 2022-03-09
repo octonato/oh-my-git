@@ -94,7 +94,7 @@ function ghp() {
                   shift
                   PR_NUMBER=$1; shift
                   cd $PROJ_DIR
-                  pr.checkout $PR_NUMBER
+                  gh po $PR_NUMBER
                   edit.current $@
                   ;; 
 
@@ -103,36 +103,20 @@ function ghp() {
                   (
                     echo "Status for $DIR"
                     cd $PROJ_DIR
-                    pr.status
+                    gh pr status
                   )
                   ;;
 
-              -o|--open)
+              -v|--view-browser)
                   shift
                   (
                     echo "Browse $DIR"
                     cd $PROJ_DIR
-                    pr.open
+                    gh pr view -w
                   )
                   ;;
 
               -d|--delete)
-                  shift
-                  (
-                    cd $PROJ_DIR
-                    git.branch.delete .
-                  )
-                  ;;                  
-
-              -D|--force-delete)
-                  shift
-                  (
-                    cd $PROJ_DIR
-                    git.branch.delete.force .
-                  )
-                  ;;
-
-              -r|--remove)
                   shift
                   (
                     echo "Removing $PROJ_DIR"
@@ -144,7 +128,7 @@ function ghp() {
                   shift
                   (
                     cd $PROJ_DIR
-                    hub pr list $@
+                    gh pr list
                   )
                   ;;
               

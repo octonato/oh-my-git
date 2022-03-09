@@ -5,8 +5,6 @@ usage() {
     echo "Any other arguments will be passed over to actual commant"
     echo 
     echo "Provided alias: (misc)"
-    echo "   pr.list      hub pr list"
-    echo "   pr.checkout  hub pr checkout"
     echo "   gfu          git fetch upstream "
     echo "   backport     git backport"
     echo "   wb           git.workbranch"
@@ -20,19 +18,12 @@ usage() {
     echo "   gc.pr                    Add all, commit with <message> and create a PR"
     echo "   git.rebase.interactive   Run an interactive rebase with the last <num> commits"
     echo "   git.workbranch           Create a local clone and and prepare a branch. Branch name can be prefixed with env var GH_USER_PREFIX"
-    echo "   git.branch.delete        Delete 'origin' and local copies of a branch if it was a PR and it is 'merged'"
-    echo "   git.branch.delete.force  Forcefuly delete 'origin' and local copies of a branch"
     echo 
     echo "Provided functions: (GitHub)"
     echo "   ghp            ????"
     echo "   edit.current   ????"
     echo "   ghp.org        ????"
     echo 
-    echo "Provided functions: (hub)"
-    echo "   pr.open         Open a browser to the PR for the current repo and the provided <PR-id>"
-    echo "   pr.status       Print a status summary (merged, state, CI) for the givern <PR-id>"
-    echo "   pr.merged       Print wether the PR <PR-id> is already merged"
-    echo "   pr.new          Create and submit a new PR (only works if $EDITOR is E-macs or VSCode)"
     echo 
     echo "Git extensions:"
     echo "   backport        Backports cherry-picked commits between the specified barnches"

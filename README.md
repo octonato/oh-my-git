@@ -69,10 +69,3 @@ git clone-fork git@github.com:lagom/lagom.git
 ```
 
 **Note** only the `SSH` protocol (not `HTTPS`) is supported.
-
-### pr.new
-
-The commant `pr.new` doesn't work if your git editor is set to `vim`. 
-You will get the following error message: `Vim: Warning: Output is not to a terminal`. 
-
-To use that command you will need to switch to another editor: VS Code and Emacs are know to work.
