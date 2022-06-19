@@ -65,6 +65,13 @@ function ghp() {
                     edit .
                   )
                   ;;
+              -n|--edit-nvim)
+                  shift
+                  (
+                    cd $PROJ_DIR
+                    nvim .
+                  )
+                  ;;
               -c|--command)
                   shift
                   (
