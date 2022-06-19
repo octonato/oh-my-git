@@ -131,11 +131,21 @@ function ghp() {
                   )
                   ;;
 
-              -l|--pr-list)
+              -pl|--pr-list)
                   shift
                   (
                     cd $PROJ_DIR
-                    gh pr list
+                    if [ -d .git ]; then 
+                      gh pr list
+                    elif [ -d main ]; then
+                      cd main 
+                      gh pr list
+                    elif [ -d master ]; then 
+                      cd master 
+                      gh pr list
+                    else 
+                      gh pr list
+                    fi
                   )
                   ;;
               
@@ -147,6 +157,14 @@ function ghp() {
               -h|--help)
                   shift
                   usage.ghp
+                  ;;
+
+              -l | --list)
+              shift
+                  (
+                    cd $PROJ_DIR
+                    ls -l
+                  )
                   ;;
               *)
                   echo "Sorry, I don't understand '$1'"
