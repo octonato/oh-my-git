@@ -65,6 +65,21 @@ function ghp() {
                     edit .
                   )
                   ;;
+              -n|--edit-nvim)
+                  shift
+                  (
+                    cd $PROJ_DIR
+                    nvim .
+                  )
+                  ;;
+              -c|--command)
+                  shift
+                  (
+                    cd $PROJ_DIR
+                    ${@}
+                  )
+                  shift $#
+                  ;;                  
 
               -i|--intellij)
                   shift
@@ -78,7 +93,7 @@ function ghp() {
                   shift
                   BRANCH_NAME=$1; shift
                   cd $PROJ_DIR
-                  workbranch $BRANCH_NAME
+                  git.workbranch $BRANCH_NAME
                   edit.current $@
                   ;;
 
@@ -86,7 +101,7 @@ function ghp() {
                   shift
                   PR_NUMBER=$1; shift
                   cd $PROJ_DIR
-                  pr.checkout $PR_NUMBER
+                  gh po $PR_NUMBER
                   edit.current $@
                   ;; 
 
@@ -95,47 +110,42 @@ function ghp() {
                   (
                     echo "Status for $DIR"
                     cd $PROJ_DIR
-                    pr.status
+                    gh pr status
                   )
                   ;;
 
-              -o|--open)
+              -v|--view-browser)
                   shift
                   (
                     echo "Browse $DIR"
                     cd $PROJ_DIR
-                    pr.open
+                    gh pr view -w
                   )
                   ;;
 
               -d|--delete)
                   shift
                   (
-                    cd $PROJ_DIR
-                    git.branch.delete .
-                  )
-                  ;;                  
-
-              -D|--force-delete)
-                  shift
-                  (
-                    cd $PROJ_DIR
-                    git.branch.delete.force .
-                  )
-                  ;;
-
-              -r|--remove)
-                  shift
-                  (
+                    echo "Removing $PROJ_DIR"
                     rm -rf $PROJ_DIR
                   )
                   ;;
 
-              -l|--pr-list)
+              -pl|--pr-list)
                   shift
                   (
                     cd $PROJ_DIR
-                    hub pr list $@
+                    if [ -d .git ]; then 
+                      gh pr list
+                    elif [ -d main ]; then
+                      cd main 
+                      gh pr list
+                    elif [ -d master ]; then 
+                      cd master 
+                      gh pr list
+                    else 
+                      gh pr list
+                    fi
                   )
                   ;;
               
@@ -147,6 +157,14 @@ function ghp() {
               -h|--help)
                   shift
                   usage.ghp
+                  ;;
+
+              -l | --list)
+              shift
+                  (
+                    cd $PROJ_DIR
+                    ls -l
+                  )
                   ;;
               *)
                   echo "Sorry, I don't understand '$1'"
