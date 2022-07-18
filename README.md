@@ -4,10 +4,9 @@ A collection of git scripts that I use to automate my workflow
 
 ## Requirements
 
-Some commands requires extra libraries, namely `hub` and `jq`. 
+Some commands requires extra libraries the GitHub CLI.
 
-* `hub`  - https://hub.github.com/
-* `jq` - https://stedolan.github.io/jq/
+* `gh`  - https://cli.github.com
 * `complete` (a default function in bash)
 
 ## Install
@@ -15,13 +14,14 @@ Some commands requires extra libraries, namely `hub` and `jq`.
 ### Check out this repo
 
 ```bash
-git clone git@github.com:renatocaval/oh-my-git.git
+git clone git@github.com:octonato/oh-my-git.git
 ```
 
 * Add the bin folder to your PATH
 * source `git-functions.sh` and `gh-functions.sh`
 * define env variable: `GITHUB_SRC` (eg: GITHUB_SRC=/Users/renato)
-* define env variable: `GITHUB_USER` (eg: GITHUB_USER=renatocaval)
+* define env variable: `GITHUB_USER` (eg: GITHUB_USER=octonato)
+* define env variable: `GH_USER_PREFIX` (eg: GH_USER_PREFIX=wip) - optional. This adds a prefix to each new branch.
 
 ## Usage
 
@@ -55,9 +55,9 @@ $GITHUB_SRC
 If you followed the convention described in [Folder Structure](#Folder-Structure) you can use `ghp <TABx2>` to quickly navigate to a workbranch on your local clones useing autocompletion of the organization, repository and branch names:
 
 ```bash
-$ ghp rena<TAB>/oh-<TAB>/ 
-renatocaval/oh-my-git/doc-usage           renatocaval/oh-my-git/master
-renatocaval/oh-my-git/more-usage-docs
+$ ghp octonato<TAB>/oh-<TAB>/ 
+octonato/oh-my-git/doc-usage           octonato/oh-my-git/master
+octonato/oh-my-git/more-usage-docs
 ```
 
 ### git clone-fork
