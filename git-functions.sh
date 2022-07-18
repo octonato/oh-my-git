@@ -74,8 +74,29 @@ alias glogf='git log --decorate --graph'
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
 alias gpu='git push-upstream'
-alias gwip='ga . && gc -m wip'
+alias gwip='git-wip'
+alias gcm='git-commit-msg'
+alias gcam='git-add-commit-msg'
 
+function git-wip {
+ if [ $1 ]; then
+   MSG="wip: $@ [skip ci]"
+ else
+   MSG="wip [skip ci]"
+ fi
+
+ git-add-commit-msg "$MSG"
+}
+
+function git-commit-msg {
+ MSG="$@"
+ gc -m "$MSG"
+}
+
+function git-add-commit-msg {
+  ga .
+  git-commit-msg $@
+}
 
 function gpof {
   echo "Are you really sure you want to do a forced push on origin? (y,N)"
