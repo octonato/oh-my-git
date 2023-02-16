@@ -1,0 +1,2 @@
+#!/bin/sh
+git ls-files -v | grep '^[[:lower:]]' | cut -c 2- | xargs -L1 git update-index --no-assume-unchanged

@@ -50,9 +50,7 @@ function git.workbranch {
 
           # check it out using new branch
           git checkout -b ${GH_USER_PREFIX}${1}
-
-          # copy ide settings
-          copy-ide-settings ${REPO} $1          
+  
           cd ../$1
         else 
           echo "branch name must be passed, usage: git workbranch some-name"
@@ -70,6 +68,7 @@ alias wb='git.workbranch'
 alias wip='git.wipbranch'
 alias gs='git status'
 alias gamd='git commit -v --no-edit --amend'
+alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
@@ -77,6 +76,8 @@ alias gpu='git push-upstream'
 alias gwip='git-wip'
 alias gcm='git-commit-msg'
 alias gcam='git-add-commit-msg'
+alias gps='git-power-status'
+
 
 function git-wip {
  if [ $1 ]; then
@@ -88,9 +89,27 @@ function git-wip {
  git-add-commit-msg "$MSG"
 }
 
+function git-power-status {
+  git status 
+
+  MARKED_FILES=`git ls-files -v | grep -c '^[[:lower:]]' `
+  if [ $MARKED_FILES -gt 0 ]; then 
+    echo
+    echo "Files marked with '--assume-unchanged'"
+    git ls-files -v | grep '^[[:lower:]]'
+    echo "------------------------------------------------------------------------"
+  fi
+}
+
 function git-commit-msg {
- MSG="$@"
- gc -m "$MSG"
+  MSG="$@"
+  
+  if [[ ${#MSG} -gt 50 ]]; then 
+    echo "Commit message is too large (${#MSG} characters). It should not be larger than 50"
+  else 
+    gc -m "$MSG"
+  fi
+ 
 }
 
 function git-add-commit-msg {

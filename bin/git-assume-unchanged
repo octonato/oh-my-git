@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ $1 ]; then
+    git ls-files -m $1 | xargs -L1 git update-index --assume-unchanged
+else 
+    echo "No dir or file was passed"
+fi

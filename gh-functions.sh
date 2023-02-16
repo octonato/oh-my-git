@@ -1,22 +1,3 @@
-function ghp.org {
-  # if we got a project folder, we just use it. 
-  if [ $2 ] && [ -d $GITHUB_SRC/$1/$2 ]; then
-    # drop ORG and PROJ and pass the rest
-    PROJ_MASTER=$1/$2; shift; shift
-    ghp $PROJ_MASTER $@ # $@ minus $1 and $2
-  else
-    # $1 + $2 don't make a project, try org/master
-    ORG=$1; shift
-    PROJ_MASTER=$ORG/$ORG/master
-    if [[ -d $GITHUB_SRC/$PROJ_MASTER ]]; then
-      ghp $PROJ_MASTER $@ # $@ minus $1
-    else 
-      ghp $ORG $@ # $@ minus $1
-    fi
-  fi
-
-}
-
 function edit.current() {
   while [[ $# -gt 0 ]]
   do
@@ -179,24 +160,13 @@ function ghp() {
 }
 
 
-# same as _ghp_completions but starting at org level
-_ghp_completions_org ()   {       
-  
-  SRC_ROOT=$GITHUB_SRC/$1
-  #            list all projecst    | cut out root         | cut leading chars  | cut out trailing /
-  GH_PROJECTS=`ls -d $SRC_ROOT/*/*/ | cut -c ${#SRC_ROOT}- | cut -c 3-          | sed 's/\/$//'`
-  
-  local cur
-  COMPREPLY=()     
-  cur=${COMP_WORDS[COMP_CWORD]}
-  COMPREPLY=( $(compgen -W "${GH_PROJECTS}" -- ${cur}) )
+_ghp_completions ()   {    
 
-  return 0
-}
+  echo "..."
 
-_ghp_completions ()   {       
   #            list all projecst        | cut out root           | cut leading chars  | cut out trailing /
   GH_PROJECTS=`ls -d $GITHUB_SRC/*/*/*/ | cut -c ${#GITHUB_SRC}- | cut -c 3-          | sed 's/\/$//'`
+
 
   local cur
   COMPREPLY=()     

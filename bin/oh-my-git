@@ -38,8 +38,6 @@ usage() {
     echo "   undo            Soft resets the branch <num> commits"
     echo "   undo-hard       Hard resets the branch <num> commits"
     echo 
-    echo "Provided functions: (misc)"
-    echo "   copy-ide-settings     Duplicates IntelliJ settings from another workspace"
     echo 
     exit $1
 }
