@@ -160,5 +160,5 @@ function gpuf {
 
 function grum {
   git fetch upstream
-  git rebase upstream/master
+  git rebase upstream/main
 }
