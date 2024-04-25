@@ -32,18 +32,10 @@ function git.workbranch {
 
           # save remote urls for later
           UPSTREAM_REMOTE_URL=`git remote get-url upstream`
-          ORIGIN_REMOTE_URL=`git remote get-url origin`
-
+          
           cd ../
           git clone ${REPO} $1
           cd $1
-
-          # local points to origin (original local checkout)
-          git remote add local `git remote get-url origin`
-
-          # remove origin and read point to remove
-          git remote remove origin
-          git remote add origin $ORIGIN_REMOTE_URL
 
           # add upstream pointing to remote
           git remote add upstream $UPSTREAM_REMOTE_URL
