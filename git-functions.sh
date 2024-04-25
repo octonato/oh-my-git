@@ -32,7 +32,7 @@ function git.workbranch {
 
           # save remote urls for later
           UPSTREAM_REMOTE_URL=`git remote get-url upstream`
-          
+
           cd ../
           git clone ${REPO} $1
           cd $1

@@ -13,9 +13,9 @@ usage() {
 }
 
 if [[ $# -ne 1 ]]; then
-        COMMIT_SUMMARY_LENGTH=12
-    else
-        COMMIT_SUMMARY_LENGTH=$1
+    COMMIT_SUMMARY_LENGTH=12
+else
+    COMMIT_SUMMARY_LENGTH=$1
 fi
 
 git log -"$COMMIT_SUMMARY_LENGTH" --graph --pretty=format:'%Cred%h%Creset %s%C(yellow)%d%Creset %Cgreen(%cr)%Creset [%an]' --abbrev-commit --date=relative
