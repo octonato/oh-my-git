@@ -50,16 +50,39 @@ function git.workbranch {
     else
       echo "Not a git repository"
     fi
-
 }
 
+function git.review {
+    if [ -d .git ]; then
+      if [ $1 ]; then 
+
+          REPO=${PWD##*/}
+
+          UPSTREAM_REMOTE_URL=`git remote get-url upstream`
+          DIR=pr-review-$1
+          cd ../
+          git clone ${REPO} $DIR
+          cd $DIR
+          # add upstream pointing to remote
+          git remote add upstream $UPSTREAM_REMOTE_URL
+
+          # check it out using new branch
+          gh po ${1}  
+          cd ../$DIR
+        else 
+          echo "pull-request number, usage: git review 1234"
+        fi
+    else
+      echo "Not a git repository"
+    fi
+}
 
 alias gfu='git fetch upstream'
 alias backport='git backport'
 alias wb='git.workbranch'
 alias wip='git.wipbranch'
 alias gs='git status'
-alias gamd='git commit -v --no-edit --amend'
+alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
 alias glu='git pull-upstream'
@@ -69,7 +92,9 @@ alias gwip='git-wip'
 alias gcm='git-commit-msg'
 alias gcam='git-add-commit-msg'
 alias gps='git-power-status'
-
+alias grv='git.review'
+alias gs='git status'
+alias gu='git undo'
 
 function git-wip {
  if [ $1 ]; then
