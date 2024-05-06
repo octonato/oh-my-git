@@ -14,6 +14,7 @@ function edit.current() {
     esac
   done
 }
+
 function ghp() {
 
   function usage.ghp() {

@@ -81,7 +81,6 @@ alias gfu='git fetch upstream'
 alias backport='git backport'
 alias wb='git.workbranch'
 alias wip='git.wipbranch'
-alias gs='git status'
 alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
@@ -93,8 +92,21 @@ alias gcm='git-commit-msg'
 alias gcam='git-add-commit-msg'
 alias gps='git-power-status'
 alias grv='git.review'
-alias gs='git status'
 alias gu='git undo'
+
+function gs {
+  git status
+  echo
+  echo "----------------------------------------------------------------"
+
+  if [ $# -gt 0 ]; then
+    NUM_COMMITS=$1
+  else
+    NUM_COMMITS=5
+  fi
+
+  git log --oneline --decorate --color=always -n $NUM_COMMITS | less -F
+}
 
 function git-wip {
  if [ $1 ]; then

@@ -4,10 +4,7 @@ A collection of git scripts that I use to automate my workflow
 
 ## Requirements
 
-Some commands requires extra libraries the GitHub CLI.
-
-* `gh`  - https://cli.github.com
-* `complete` (a default function in bash)
+Most commands requires GitHub's cli, https://cli.github.com.
 
 ## Install
 
@@ -56,7 +53,7 @@ If you followed the convention described in [Folder Structure](#Folder-Structure
 
 ```bash
 $ ghp octo<TAB>/oh-<TAB>/ 
-octonato/oh-my-git/doc-usage           octonato/oh-my-git/master
+octonato/oh-my-git/doc-usage           octonato/oh-my-git/main
 octonato/oh-my-git/more-usage-docs
 ```
 
@@ -65,7 +62,7 @@ octonato/oh-my-git/more-usage-docs
 Quickly clone and fork a git repository. 
 
 ```
-git clone-fork git@github.com:lagom/lagom.git
+git clone-fork git@github.com:akka/akka.git
 ```
 
 **Note** only the `SSH` protocol (not `HTTPS`) is supported.
