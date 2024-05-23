@@ -79,11 +79,11 @@ function ghp() {
                   edit.current $@
                   ;;
 
-              -pr |--pr-checkout)
+              -r |--review)
                   shift
                   PR_NUMBER=$1; shift
                   cd $PROJ_DIR
-                  gh po $PR_NUMBER
+                  git.review $PR_NUMBER
                   edit.current $@
                   ;; 
 
@@ -165,7 +165,6 @@ _ghp_completions ()   {
 
   echo "..."
 
-  #            list all projecst        | cut out root           | cut leading chars  | cut out trailing /
   GH_PROJECTS=`ls -d $GITHUB_SRC/*/*/*/ | cut -c ${#GITHUB_SRC}- | cut -c 3-          | sed 's/\/$//'`
 
 
