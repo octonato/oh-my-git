@@ -84,28 +84,34 @@ alias wip='git.wipbranch'
 alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
+
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
 alias gpu='git push-upstream'
 alias gwip='git-wip'
 alias gcm='git-commit-msg'
 alias gcam='git-add-commit-msg'
-alias gps='git-power-status'
 alias grv='git.review'
 alias gu='git undo'
+alias gs='git.status'
 
-function gs {
+function git-show-files() {
+  git diff --name-only HEAD^ HEAD | less -F
+}
+
+
+function gls() {
+  if [ $# -gt 0 ]; then
+    (git-power-status; git log --oneline --decorate --color=always -n $1 ) | less -r
+  else
+    (git-power-status; git log --oneline --decorate --color=always) | less -r
+  fi
+}
+
+function git.status {
   git status
   echo
   echo "----------------------------------------------------------------"
-
-  if [ $# -gt 0 ]; then
-    NUM_COMMITS=$1
-  else
-    NUM_COMMITS=5
-  fi
-
-  git log --oneline --decorate --color=always -n $NUM_COMMITS | less -F
 }
 
 function git-wip {
@@ -126,8 +132,9 @@ function git-power-status {
     echo
     echo "Files marked with '--assume-unchanged'"
     git ls-files -v | grep '^[[:lower:]]'
-    echo "------------------------------------------------------------------------"
   fi
+  echo
+  echo "------------------------------------------------------------------------"
 }
 
 function git-commit-msg {
