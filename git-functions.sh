@@ -95,6 +95,11 @@ alias grv='git.review'
 alias gu='git undo'
 alias gs='git.status'
 
+function ask { 
+  MSG="$@"
+  gh copilot explain $MSG
+}
+
 function git-show-files() {
   git diff --name-only HEAD^ HEAD | less -F
 }
@@ -141,7 +146,8 @@ function git-commit-msg {
   MSG="$@"
   
   if [[ ${#MSG} -gt 50 ]]; then 
-    echo "Commit message is too large (${#MSG} characters). It should not be larger than 50"
+    echo -e "\033[31mWarning: Commit message is too large (${#MSG} characters). It should not be larger than 50\033[0m"
+    gc -m "$MSG"
   else 
     gc -m "$MSG"
   fi
