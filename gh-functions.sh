@@ -161,16 +161,16 @@ _ghp_completions() {
   _alternative \
     'paths:path:_files -W "~" -/' \
     'options:option:_values "ghp options" \
-      "-e[Open in editor ($EDITOR)]" \
-      "--edit[Open in editor ($EDITOR)]" \
+      "-e[Open in editor]" \
+      "--edit[Open in editor]" \
       "-n[Open in nvim]" \
       "--edit-nvim[Open in nvim]" \
       "-c[Run command in directory]" \
       "--command[Run command in directory]" \
       "-i[Open in IntelliJ]" \
       "--intellij[Open in IntelliJ]" \
-      "-b[Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>]" \
-      "--branch[Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>]" \
+      "-b[Switch to branch. A new branch will be created in ../<branch-name> and called GH_USER_PREFIX/<branch-name>]" \
+      "--branch[Switch to branch. A new branch will be created in ../<branch-name> and called GH_USER_PREFIX/<branch-name>]" \
       "-r[Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>]" \
       "--review[Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>]" \
       "-s[Show PR status]" \
