@@ -35,8 +35,8 @@ function ghp() {
   }
 
   if [ $1 ]; then
-    DIR=$1; shift
-    PROJ_DIR=$DIR
+    PROJ_DIR="$GITHUB_SRC/$1"
+    shift
 
     if [[ $# -eq 0 ]]; then
       echo "switching to $PROJ_DIR"
@@ -153,13 +153,14 @@ function ghp() {
   fi
 }
 
-# Zsh completion for ghp command
 _ghp_completions() {
-  local curcontext="$curcontext" state line
-  typeset -A opt_args
+  if (( CURRENT == 2 )); then
+    # Complete directories recursively under $GITHUB_SRC
+    _files -W "$GITHUB_SRC" -/ && return
+  fi
 
+  # After the first argument, complete options
   _alternative \
-    'paths:path:_files -W "~" -/' \
     'options:option:_values "ghp options" \
       "-e[Open in editor]" \
       "--edit[Open in editor]" \
@@ -169,10 +170,10 @@ _ghp_completions() {
       "--command[Run command in directory]" \
       "-i[Open in IntelliJ]" \
       "--intellij[Open in IntelliJ]" \
-      "-b[Switch to branch. A new branch will be created in ../<branch-name> and called GH_USER_PREFIX/<branch-name>]" \
-      "--branch[Switch to branch. A new branch will be created in ../<branch-name> and called GH_USER_PREFIX/<branch-name>]" \
-      "-r[Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>]" \
-      "--review[Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>]" \
+      "-b[Switch to branch]" \
+      "--branch[Switch to branch]" \
+      "-r[Review PR]" \
+      "--review[Review PR]" \
       "-s[Show PR status]" \
       "--status[Show PR status]" \
       "-v[Open in browser]" \
@@ -188,5 +189,4 @@ _ghp_completions() {
       "-l[List directory contents]" \
       "--list[List directory contents]"'
 }
-
 compdef _ghp_completions ghp
