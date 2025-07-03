@@ -91,7 +91,7 @@ function ghp() {
           -s|--status)
             shift
             (
-              echo "Status for $DIR"
+              echo "Status for $PROJ_DIR"
               cd $PROJ_DIR
               gh pr status
             )
@@ -99,7 +99,7 @@ function ghp() {
           -v|--view-browser)
             shift
             (
-              echo "Browse $DIR"
+              echo "Browse $PROJ_DIR"
               cd $PROJ_DIR
               gh pr view -w
             )
