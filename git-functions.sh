@@ -1,12 +1,16 @@
 
 function git.rebase.interactive {
-    if [ $1 ] ; then
-        git rebase -i HEAD~"$1"
+  if [ $1 ]; then
+    if [[ $1 =~ ^[0-9]+$ ]]; then
+      git rebase -i HEAD~"$1"
     else
-        echo "A HEAD~{num} must be provided"
-        echo
-        git recent
+      git rebase -i "$1"
     fi
+  else
+    echo "A HEAD~{num} or branch name must be provided"
+    echo
+    git recent
+  fi
 }
 
 alias gri=git.rebase.interactive
@@ -26,8 +30,6 @@ function git.wipbranch {
 function git.workbranch {
     if [ -d .git ]; then
       if [ $1 ]; then 
-          git-pull-upstream
-          
           REPO=${PWD##*/}
 
           # save remote urls for later
@@ -42,8 +44,15 @@ function git.workbranch {
 
           # check it out using new branch
           git checkout -b ${GH_USER_PREFIX}${1}
-  
+
           cd ../$1
+
+          read "reply?Pull upstream? [Y/n] "
+          if [[ "$reply" =~ ^[Nn]$ ]]; then
+            echo "Skipping pull upstream."
+          else
+            git-pull-upstream
+          fi
         else 
           echo "branch name must be passed, usage: git workbranch some-name"
         fi
@@ -85,6 +94,7 @@ alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
 
+#alias glo='git pull-origin'
 alias glu='git pull-upstream'
 alias gpo='git push-origin'
 alias gpu='git push-upstream'
@@ -94,6 +104,7 @@ alias gcam='git-add-commit-msg'
 alias grv='git.review'
 alias gu='git undo'
 alias gs='git.status'
+alias gsh='git stash'
 
 function ask { 
   MSG="$@"

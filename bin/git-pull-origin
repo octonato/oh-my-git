@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "pulling from origin $(git-current-branch)..."
+git pull origin `git-current-branch`
