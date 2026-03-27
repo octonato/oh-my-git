@@ -21,6 +21,7 @@ function ghp() {
     echo "Options:"
     echo "  -e, --edit         Open in editor ($EDITOR)"
     echo "  -n, --edit-nvim    Open in nvim"
+    echo "  -ng, --neogit      Open in nvim with Neogit"
     echo "  -c, --command      Run command in directory"
     echo "  -i, --intellij     Open in IntelliJ"
     echo "  -b, --branch       Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
@@ -58,6 +59,13 @@ function ghp() {
             (
               cd $PROJ_DIR
               nvim .
+            )
+            ;;
+          -ng|--neogit)
+            shift
+            (
+              cd $PROJ_DIR
+              nvim -c 'Neogit'
             )
             ;;
           -c|--command)
