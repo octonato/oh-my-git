@@ -31,6 +31,7 @@ function ghp() {
     echo "  -pl, --pr-list     List PRs"
     echo "  -g, --go-to        Go to directory"
     echo "  -h, --help         Show this help"
+    echo "  -cl, --claude      Open Claude in project"
     echo "  -l, --list         List directory contents"
   }
 
@@ -135,6 +136,13 @@ function ghp() {
           -h|--help)
             shift
             usage.ghp
+            ;;
+          -cl|--claude)
+            shift
+            (
+              cd $PROJ_DIR
+              claude
+            )
             ;;
           -l|--list)
             shift
