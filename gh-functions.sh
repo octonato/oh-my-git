@@ -21,7 +21,7 @@ function ghp() {
     echo "Options:"
     echo "  -e, --edit         Open in editor ($EDITOR)"
     echo "  -n, --edit-nvim    Open in nvim"
-    echo "  -ng, --neogit      Open in nvim with Neogit"
+    echo "  -g, --git          Open in Lazygit"
     echo "  -c, --command      Run command in directory"
     echo "  -i, --intellij     Open in IntelliJ"
     echo "  -b, --branch       Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
@@ -30,7 +30,6 @@ function ghp() {
     echo "  -v, --view-browser Open in browser"
     echo "  -d, --delete       Remove directory"
     echo "  -pl, --pr-list     List PRs"
-    echo "  -g, --go-to        Go to directory"
     echo "  -h, --help         Show this help"
     echo "  -cl, --claude      Open Claude in project"
     echo "  -l, --list         List directory contents"
@@ -61,11 +60,11 @@ function ghp() {
               nvim .
             )
             ;;
-          -ng|--neogit)
+          -g|--git)
             shift
             (
               cd $PROJ_DIR
-              nvim -c 'Neogit'
+              lazygit
             )
             ;;
           -c|--command)
@@ -136,10 +135,6 @@ function ghp() {
                 gh pr list
               fi
             )
-            ;;
-          -g|--go-to)
-            shift
-            cd $PROJ_DIR
             ;;
           -h|--help)
             shift
