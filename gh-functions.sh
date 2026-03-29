@@ -16,8 +16,70 @@ function edit.current() {
 }
 
 function ghp() {
+  local GHP_HISTORY_FILE="$HOME/.ghp"
+
+  function _ghp_record_visit() {
+    local dir="$1"
+    touch "$GHP_HISTORY_FILE"
+    # Remove existing entry and blank lines, then prepend
+    local tmp=$(grep -Fxv "$dir" "$GHP_HISTORY_FILE" | grep -v '^[[:space:]]*$')
+    echo "$dir" > "$GHP_HISTORY_FILE"
+    if [[ -n "$tmp" ]]; then
+      echo "$tmp" >> "$GHP_HISTORY_FILE"
+    fi
+  }
+
+  function _ghp_select_recent() {
+    if [[ ! -f "$GHP_HISTORY_FILE" ]] || [[ ! -s "$GHP_HISTORY_FILE" ]]; then
+      echo "No recent projects."
+      return 1
+    fi
+
+    local -a dirs
+    local i=0
+    while IFS= read -r line && (( i < 10 )); do
+      [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+      dirs+=("$line")
+      (( i++ ))
+    done < "$GHP_HISTORY_FILE"
+
+    echo "Recent projects:"
+    local current_dir="$PWD"
+    for (( i=1; i <= ${#dirs[@]}; i++ )); do
+      local num=$((i - 1))
+      local display_path="${dirs[$i]#$GITHUB_SRC/}"
+      if [[ "${dirs[$i]}" == "$current_dir" ]]; then
+        printf " %2d  \e[1;4m%s\e[0m\n" "$num" "$display_path"
+      else
+        printf " %2d  %s\n" "$num" "$display_path"
+      fi
+    done
+    echo ""
+
+    local input
+    printf "Select number (Esc to cancel): "
+    while true; do
+      read -r -k 1 input
+      # Esc
+      if [[ "$input" == $'\e' ]]; then
+        echo ""
+        return 1
+      fi
+      # Digit
+      if [[ "$input" =~ ^[0-9]$ ]] && (( input < ${#dirs[@]} )); then
+        echo ""
+        local idx=$((input + 1))
+        _ghp_record_visit "${dirs[$idx]}"
+        cd "${dirs[$idx]}"
+        return 0
+      fi
+      # Invalid input — ignore and keep waiting
+    done
+  }
+
   function usage.ghp() {
     echo "Usage: ghp <hash-path> [options]"
+    echo "       ghp                  Show recent projects"
     echo "Options:"
     echo "  -e, --edit         Open in editor ($EDITOR)"
     echo "  -n, --edit-nvim    Open in nvim"
@@ -35,12 +97,18 @@ function ghp() {
     echo "  -l, --list         List directory contents"
   }
 
+  if [[ $# -eq 0 ]]; then
+    _ghp_select_recent
+    return
+  fi
+
   if [ $1 ]; then
     PROJ_DIR="$GITHUB_SRC/$1"
     shift
 
     if [[ $# -eq 0 ]]; then
       echo "switching to $PROJ_DIR"
+      _ghp_record_visit "$PROJ_DIR"
       cd $PROJ_DIR
     else
       while [[ $# -gt 0 ]]
@@ -85,6 +153,7 @@ function ghp() {
           -b|--branch)
             shift
             BRANCH_NAME=$1; shift
+            _ghp_record_visit "$PROJ_DIR"
             cd $PROJ_DIR
             git.workbranch $BRANCH_NAME
             edit.current $@
@@ -92,6 +161,7 @@ function ghp() {
           -r|--review)
             shift
             PR_NUMBER=$1; shift
+            _ghp_record_visit "$PROJ_DIR"
             cd $PROJ_DIR
             git.review $PR_NUMBER
             edit.current $@
