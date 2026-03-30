@@ -42,6 +42,9 @@ function git.workbranch {
           # add upstream pointing to remote
           git remote add upstream $UPSTREAM_REMOTE_URL
 
+          # save base branch before switching
+          BASE_BRANCH=`git-current-branch`
+
           # check it out using new branch
           git checkout -b ${GH_USER_PREFIX}${1}
 
@@ -51,7 +54,8 @@ function git.workbranch {
           if [[ "$reply" =~ ^[Nn]$ ]]; then
             echo "Skipping pull upstream."
           else
-            git-pull-upstream
+            echo "pulling from upstream ${BASE_BRANCH}..."
+            git pull upstream $BASE_BRANCH
           fi
         else 
           echo "branch name must be passed, usage: git workbranch some-name"
