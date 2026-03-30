@@ -57,23 +57,36 @@ function ghp() {
     echo ""
 
     local input
+    local typed=""
     printf "Select number (Esc to cancel): "
     while true; do
-      read -r -k 1 input
+      read -r -s -k 1 input
       # Esc
       if [[ "$input" == $'\e' ]]; then
         echo ""
         return 1
       fi
+      # Backspace / Delete
+      if [[ "$input" == $'\x7f' || "$input" == $'\b' ]]; then
+        if [[ -n "$typed" ]]; then
+          typed="${typed%?}"
+          printf '\b \b'
+        fi
+        continue
+      fi
       # Digit
       if [[ "$input" =~ ^[0-9]$ ]] && (( input < ${#dirs[@]} )); then
-        echo ""
+        printf '%s\n' "$input"
         local idx=$((input + 1))
         _ghp_record_visit "${dirs[$idx]}"
         cd "${dirs[$idx]}"
         return 0
       fi
-      # Invalid input — ignore and keep waiting
+      # Non-digit: show it so user sees what they typed, then they can backspace
+      if [[ "$input" =~ ^[[:print:]]$ ]]; then
+        typed+="$input"
+        printf '%s' "$input"
+      fi
     done
   }
 
