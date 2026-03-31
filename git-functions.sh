@@ -50,7 +50,7 @@ function git.workbranch {
 
           cd ../$1
 
-          read "reply?Pull upstream? [Y/n] "
+          read "reply?Pull upstream [upstream/$BASE_BRANCH]? [Y/n] "
           if [[ "$reply" =~ ^[Nn]$ ]]; then
             echo "Skipping pull upstream."
           else
