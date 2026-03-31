@@ -94,20 +94,20 @@ function ghp() {
     echo "Usage: ghp <hash-path> [options]"
     echo "       ghp                  Show recent projects"
     echo "Options:"
-    echo "  -e, --edit         Open in editor ($EDITOR)"
-    echo "  -n, --edit-nvim    Open in nvim"
-    echo "  -g, --git          Open in Lazygit"
-    echo "  -c, --command      Run command in directory"
-    echo "  -i, --intellij     Open in IntelliJ"
-    echo "  -b, --branch       Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
-    echo "  -r, --review       Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>."
-    echo "  -s, --status       Show PR status"
-    echo "  -v, --view-browser Open in browser"
-    echo "  -d, --delete       Remove directory"
-    echo "  -pl, --pr-list     List PRs"
-    echo "  -h, --help         Show this help"
-    echo "  -cl, --claude      Open Claude in project"
-    echo "  -l, --list         List directory contents"
+    echo "  -vs, --vscode       Open in VS code"
+    echo "  -n,  --nvim         Open in nvim"
+    echo "  -i,  --intellij     Open in IntelliJ"
+    echo "  -g,  --git          Open in Lazygit"
+    echo "  -c,  --command      Run command in directory"
+    echo "  -b,  --branch       Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
+    echo "  -r,  --review       Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>."
+    echo "  -s,  --status       Show PR status"
+    echo "  -v,  --view-browser Open in browser"
+    echo "  -d,  --delete       Remove directory"
+    echo "  -pl, --pr-list      List PRs"
+    echo "  -h,  --help         Show this help"
+    echo "  -cl, --claude       Open Claude in project"
+    echo "  -l,  --list         List directory contents"
   }
 
   if [[ $# -eq 0 ]]; then
@@ -127,14 +127,14 @@ function ghp() {
       while [[ $# -gt 0 ]]
       do
         case $1 in
-          -e|--edit)
+          -vs|--vscode)
             shift
             (
               cd $PROJ_DIR
-              edit .
+              vs .
             )
             ;;
-          -n|--edit-nvim)
+          -n|--nvim)
             shift
             (
               cd $PROJ_DIR
