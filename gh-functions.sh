@@ -8,9 +8,15 @@ function edit.current() {
         ;;
 
       -i|--intellij)
-          shift
-          ij
-          ;;
+        shift
+        ij
+        ;;
+
+      -n|--nvim)
+        shift
+        cd $PROJ_DIR
+        nvim .
+        ;;
     esac
   done
 }
@@ -94,7 +100,7 @@ function ghp() {
     echo "Usage: ghp <hash-path> [options]"
     echo "       ghp                  Show recent projects"
     echo "Options:"
-    echo "  -vs, --vscode       Open in VS code"
+    echo "  -e,  --edit         Open in default editor (${EDITOR})"
     echo "  -n,  --nvim         Open in nvim"
     echo "  -i,  --intellij     Open in IntelliJ"
     echo "  -g,  --git          Open in Lazygit"
@@ -127,11 +133,11 @@ function ghp() {
       while [[ $# -gt 0 ]]
       do
         case $1 in
-          -vs|--vscode)
+          -e|--edit)
             shift
             (
               cd $PROJ_DIR
-              vs .
+              ${EDITOR} .
             )
             ;;
           -n|--nvim)
