@@ -17,7 +17,7 @@ alias gri=git.rebase.interactive
 
 function git.wipbranch {
   if [ -d .git ]; then
-      if [ $1 ]; then 
+      if [ $1 ]; then
           git checkout -b ${GH_USER_PREFIX}${1}
       fi
   fi
@@ -75,9 +75,32 @@ function git.worktree.remove {
     fi
 }
 
+# delete a branch directory, handling both worktrees and hard forks
+function git.delete.branch {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+      echo "Directory not found: $dir"
+      return 1
+    fi
+
+    if [ -f "$dir/.git" ]; then
+      # It's a worktree, remove it properly via gtr from the main worktree
+      local WORKTREE_NAME=$(basename "$dir")
+      local MAIN_DIR=$(dirname "$dir")/main
+      echo "Removing worktree $WORKTREE_NAME"
+      (
+        cd "$MAIN_DIR"
+        gtr "../$WORKTREE_NAME"
+      )
+    else
+      echo "Removing $dir"
+      rm -rf "$dir"
+    fi
+}
+
 function git.review {
     if [ -d .git ]; then
-      if [ $1 ]; then 
+      if [ $1 ]; then
 
           REPO=${PWD##*/}
 
@@ -90,9 +113,9 @@ function git.review {
           git remote add upstream $UPSTREAM_REMOTE_URL
 
           # check it out using new branch
-          gh po ${1}  
+          gh po ${1}
           cd ../$DIR
-        else 
+        else
           echo "pull-request number, usage: git review 1234"
         fi
     else
@@ -122,10 +145,6 @@ alias gu='git undo'
 alias gs='git.status'
 alias gsh='git stash'
 
-function ask { 
-  MSG="$@"
-  gh copilot explain $MSG
-}
 
 function git-show-files() {
   git diff --name-only HEAD^ HEAD | less -F
@@ -157,10 +176,10 @@ function git-wip {
 }
 
 function git-power-status {
-  git status 
+  git status
 
   MARKED_FILES=`git ls-files -v | grep -c '^[[:lower:]]' `
-  if [ $MARKED_FILES -gt 0 ]; then 
+  if [ $MARKED_FILES -gt 0 ]; then
     echo
     echo "Files marked with '--assume-unchanged'"
     git ls-files -v | grep '^[[:lower:]]'
@@ -171,14 +190,14 @@ function git-power-status {
 
 function git-commit-msg {
   MSG="$@"
-  
-  if [[ ${#MSG} -gt 50 ]]; then 
+
+  if [[ ${#MSG} -gt 50 ]]; then
     echo -e "\033[31mWarning: Commit message is too large (${#MSG} characters). It should not be larger than 50\033[0m"
     gc -m "$MSG"
-  else 
+  else
     gc -m "$MSG"
   fi
- 
+
 }
 
 function git-add-commit-msg {
@@ -192,10 +211,10 @@ function gpof {
 
   if [ "$confirm" = "y" ]; then
     git push-origin --force
-  else 
+  else
     echo "Yeah, better so!"
   fi
-  
+
 }
 
 function gpuf {
@@ -204,13 +223,40 @@ function gpuf {
 
   if [ "$confirm" = "y" ]; then
     git push-upstream --force
-  else 
+  else
     echo "Yeah, better so!"
   fi
-  
+
 }
 
 function grum {
   git fetch upstream
   git rebase upstream/main
+}
+
+
+function git.prune.pr() {
+  for dir in */; do
+    dir_name="${dir%/}"
+    if [ "$dir_name" = "main" ]; then
+      continue
+    fi
+
+    if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+      echo "\n--------------------------------------------------------------"
+      echo "Checking $dir"
+
+      cd "$dir"
+      pr_status=$(gh pr status 2>&1)
+
+      if echo "$pr_status" | grep -A 1 "Current branch" | grep -q "Merged"; then
+        echo "  PR is merged. Deleting directory..."
+        cd ..
+        git.delete.branch "$dir"
+      else
+        echo "  PR is not merged"
+        cd ..
+      fi
+    fi
+  done
 }
