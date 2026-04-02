@@ -57,6 +57,24 @@ function git.worktree {
     fi
 }
 
+# remove a worktree and its branch
+function git.worktree.remove {
+    if [ -d .git ]; then
+      if [ $1 ]; then
+          WORKTREE_PATH="$1"
+          DIR_NAME="${WORKTREE_PATH##*/}"
+          BRANCH_NAME="${GH_USER_PREFIX}${DIR_NAME}"
+
+          git worktree remove "$WORKTREE_PATH"
+          git branch -D "$BRANCH_NAME"
+        else
+          echo "path must be passed, usage: gtr ../some-name"
+        fi
+    else
+      echo "Not a git repository"
+    fi
+}
+
 function git.review {
     if [ -d .git ]; then
       if [ $1 ]; then 
@@ -86,6 +104,7 @@ alias gfu='git fetch upstream'
 alias backport='git backport'
 alias wb='git.workbranch'
 alias wt='git.worktree'
+alias gtr='git.worktree.remove'
 alias wip='git.wipbranch'
 alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
