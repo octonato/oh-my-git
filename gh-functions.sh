@@ -214,10 +214,21 @@ function ghp() {
             ;;
           -d|--delete)
             shift
-            (
+            if [ -f "$PROJ_DIR/.git" ]; then
+              # It's a worktree, remove it properly via gtr from the main worktree
+              local WORKTREE_NAME=$(basename "$PROJ_DIR")
+              local MAIN_DIR=$(dirname "$PROJ_DIR")/main
+              echo "Removing worktree $WORKTREE_NAME"
+              (
+                cd "$MAIN_DIR"
+                gtr "../$WORKTREE_NAME"
+              )
+            else
               echo "Removing $PROJ_DIR"
-              qrm -rf $PROJ_DIR
-            )
+              (
+                qrm -rf $PROJ_DIR
+              )
+            fi
             ;;
           -pl|--pr-list)
             shift
