@@ -23,32 +23,24 @@ function git.wipbranch {
   fi
 }
 
-# create a working branch, similar to `git worktree`
-# but works by creating a local clone. 
-# If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch, 
-# eg: GH_USER_PREFIX=wip- results in wip-{chosen-branch-name}
+# deprecated: use git.worktree instead
 function git.workbranch {
+    echo "\033[33m⚠ 'wb' is deprecated. Use 'wt' (git.worktree) instead.\033[0m"
+    echo ""
+    git.worktree "$@"
+}
+
+# create a working branch using git worktree
+# If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch,
+# eg: GH_USER_PREFIX=wip- results in wip-{chosen-branch-name}
+function git.worktree {
     if [ -d .git ]; then
-      if [ $1 ]; then 
-          REPO=${PWD##*/}
-
-          # save remote urls for later
-          UPSTREAM_REMOTE_URL=`git remote get-url upstream`
-
-          cd ../
-          git clone ${REPO} $1
-          cd $1
-
-          # add upstream pointing to remote
-          git remote add upstream $UPSTREAM_REMOTE_URL
-
-          # save base branch before switching
+      if [ $1 ]; then
           BASE_BRANCH=`git-current-branch`
+          WORKTREE_PATH="../${1}"
 
-          # check it out using new branch
-          git checkout -b ${GH_USER_PREFIX}${1}
-
-          cd ../$1
+          git worktree add -b ${GH_USER_PREFIX}${1} "$WORKTREE_PATH"
+          cd "$WORKTREE_PATH"
 
           read "reply?Pull upstream [upstream/$BASE_BRANCH]? [Y/n] "
           if [[ "$reply" =~ ^[Nn]$ ]]; then
@@ -57,8 +49,8 @@ function git.workbranch {
             echo "pulling from upstream ${BASE_BRANCH}..."
             git pull upstream $BASE_BRANCH
           fi
-        else 
-          echo "branch name must be passed, usage: git workbranch some-name"
+        else
+          echo "branch name must be passed, usage: git worktree some-name"
         fi
     else
       echo "Not a git repository"
@@ -93,6 +85,7 @@ function git.review {
 alias gfu='git fetch upstream'
 alias backport='git backport'
 alias wb='git.workbranch'
+alias wt='git.worktree'
 alias wip='git.wipbranch'
 alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'

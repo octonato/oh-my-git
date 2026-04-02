@@ -106,6 +106,7 @@ function ghp() {
     echo "  -g,  --git          Open in Lazygit"
     echo "  -c,  --command      Run command in directory"
     echo "  -b,  --branch       Switch to branch. A new branch will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
+    echo "  -t,  --worktree     Switch to branch using git worktree. A new worktree will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
     echo "  -r,  --review       Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>."
     echo "  -s,  --status       Show PR status"
     echo "  -v,  --view-browser Open in browser"
@@ -171,10 +172,20 @@ function ghp() {
             ;;
           -b|--branch)
             shift
+            echo "\033[33m⚠ '-b|--branch' is deprecated. Use '-t|--worktree' instead.\033[0m"
+            echo ""
             BRANCH_NAME=$1; shift
             _ghp_record_visit "$PROJ_DIR"
             cd $PROJ_DIR
-            git.workbranch $BRANCH_NAME
+            git.worktree $BRANCH_NAME
+            edit.current $@
+            ;;
+          -t|--worktree)
+            shift
+            BRANCH_NAME=$1; shift
+            _ghp_record_visit "$PROJ_DIR"
+            cd $PROJ_DIR
+            git.worktree $BRANCH_NAME
             edit.current $@
             ;;
           -r|--review)
@@ -272,6 +283,8 @@ _ghp_completions() {
       "--intellij[Open in IntelliJ]" \
       "-b[Switch to branch]" \
       "--branch[Switch to branch]" \
+      "-t[Switch to branch using worktree]" \
+      "--worktree[Switch to branch using worktree]" \
       "-r[Review PR]" \
       "--review[Review PR]" \
       "-s[Show PR status]" \
