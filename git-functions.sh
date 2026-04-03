@@ -1,4 +1,26 @@
 
+alias gfu='git fetch upstream'
+alias backport='git backport'
+alias wb='git.workbranch'
+alias wt='git.worktree'
+alias gtr='git.worktree.remove'
+alias wip='git.wipbranch'
+alias gam='git commit -v --no-edit --amend'
+alias gama='git commit -v --no-edit --amend -a'
+alias glogf='git log --decorate --graph'
+
+#alias glo='git pull-origin'
+alias glu='git pull-upstream'
+alias gpo='git push-origin'
+alias gpu='git push-upstream'
+alias gwip='git-wip'
+alias gcm='git-commit-msg'
+alias gcam='git-add-commit-msg'
+alias grv='git.review'
+alias gu='git undo'
+alias gs='git.status'
+alias gsh='git stash'
+
 function git.rebase.interactive {
   if [ $1 ]; then
     if [[ $1 =~ ^[0-9]+$ ]]; then
@@ -57,47 +79,6 @@ function git.worktree {
     fi
 }
 
-# remove a worktree and its branch
-function git.worktree.remove {
-    if [ -d .git ]; then
-      if [ $1 ]; then
-          WORKTREE_PATH="$1"
-          DIR_NAME="${WORKTREE_PATH##*/}"
-          BRANCH_NAME="${GH_USER_PREFIX}${DIR_NAME}"
-
-          git worktree remove "$WORKTREE_PATH"
-          git branch -D "$BRANCH_NAME"
-        else
-          echo "path must be passed, usage: gtr ../some-name"
-        fi
-    else
-      echo "Not a git repository"
-    fi
-}
-
-# delete a branch directory, handling both worktrees and hard forks
-function git.delete.branch {
-    local dir="$1"
-    if [ ! -d "$dir" ]; then
-      echo "Directory not found: $dir"
-      return 1
-    fi
-
-    if [ -f "$dir/.git" ]; then
-      # It's a worktree, remove it properly via gtr from the main worktree
-      local WORKTREE_NAME=$(basename "$dir")
-      local MAIN_DIR=$(dirname "$dir")/main
-      echo "Removing worktree $WORKTREE_NAME"
-      (
-        cd "$MAIN_DIR"
-        gtr "../$WORKTREE_NAME"
-      )
-    else
-      echo "Removing $dir"
-      rm -rf "$dir"
-    fi
-}
-
 function git.review {
     if [ -d .git ]; then
       if [ $1 ]; then
@@ -122,28 +103,6 @@ function git.review {
       echo "Not a git repository"
     fi
 }
-
-alias gfu='git fetch upstream'
-alias backport='git backport'
-alias wb='git.workbranch'
-alias wt='git.worktree'
-alias gtr='git.worktree.remove'
-alias wip='git.wipbranch'
-alias gam='git commit -v --no-edit --amend'
-alias gama='git commit -v --no-edit --amend -a'
-alias glogf='git log --decorate --graph'
-
-#alias glo='git pull-origin'
-alias glu='git pull-upstream'
-alias gpo='git push-origin'
-alias gpu='git push-upstream'
-alias gwip='git-wip'
-alias gcm='git-commit-msg'
-alias gcam='git-add-commit-msg'
-alias grv='git.review'
-alias gu='git undo'
-alias gs='git.status'
-alias gsh='git stash'
 
 
 function git-show-files() {
@@ -259,4 +218,46 @@ function git.prune.pr() {
       fi
     fi
   done
+}
+
+# delete a branch directory, handling both worktrees and hard forks
+function git.delete.branch {
+    local dir="$1"
+    if [ ! -d "$dir" ]; then
+      echo "Directory not found: $dir"
+      return 1
+    fi
+
+    if [ -f "$dir/.git" ]; then
+      # It's a worktree, remove it properly via gtr from the main worktree
+      local WORKTREE_NAME=$(basename "$dir")
+      local MAIN_DIR=$(dirname "$dir")/main
+      echo "Removing worktree $WORKTREE_NAME"
+      (
+        cd "$MAIN_DIR"
+        gtr "../$WORKTREE_NAME"
+      )
+    else
+      echo "Removing $dir"
+      rm -rf "$dir"
+    fi
+}
+
+
+# remove a worktree and its branch
+function git.worktree.remove {
+    if [ -d .git ]; then
+      if [ $1 ]; then
+          WORKTREE_PATH="$1"
+          DIR_NAME="${WORKTREE_PATH##*/}"
+          BRANCH_NAME="${GH_USER_PREFIX}${DIR_NAME}"
+
+          git worktree remove "$WORKTREE_PATH"
+          git branch -D "$BRANCH_NAME"
+        else
+          echo "path must be passed, usage: git.worktree.remove ../some-name"
+        fi
+    else
+      echo "Not a git repository"
+    fi
 }
