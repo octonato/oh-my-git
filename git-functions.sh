@@ -1,10 +1,8 @@
 
 alias gfu='git fetch upstream'
 alias backport='git backport'
-alias wb='git.workbranch'
 alias wt='git.worktree'
 alias gtr='git.worktree.remove'
-alias wip='git.wipbranch'
 alias gam='git commit -v --no-edit --amend'
 alias gama='git commit -v --no-edit --amend -a'
 alias glogf='git log --decorate --graph'
@@ -36,21 +34,6 @@ function git.rebase.interactive {
 }
 
 alias gri=git.rebase.interactive
-
-function git.wipbranch {
-  if [ -d .git ]; then
-      if [ $1 ]; then
-          git checkout -b ${GH_USER_PREFIX}${1}
-      fi
-  fi
-}
-
-# deprecated: use git.worktree instead
-function git.workbranch {
-    echo "\033[33m⚠ 'wb' is deprecated. Use 'wt' (git.worktree) instead.\033[0m"
-    echo ""
-    git.worktree "$@"
-}
 
 # create a working branch using git worktree
 # If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch,
