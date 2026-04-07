@@ -82,20 +82,12 @@ function git.worktree {
 function git.review {
     if [ -d .git ]; then
       if [ $1 ]; then
+          local PR_NUMBER=$1
+          local WORKTREE_PATH="../pr-review-$PR_NUMBER"
 
-          REPO=${PWD##*/}
-
-          UPSTREAM_REMOTE_URL=`git remote get-url upstream`
-          DIR=pr-review-$1
-          cd ../
-          git clone ${REPO} $DIR
-          cd $DIR
-          # add upstream pointing to remote
-          git remote add upstream $UPSTREAM_REMOTE_URL
-
-          # check it out using new branch
-          gh po ${1}
-          cd ../$DIR
+          git worktree add "$WORKTREE_PATH" --detach
+          cd "$WORKTREE_PATH"
+          gh pr checkout "$PR_NUMBER"
         else
           echo "pull-request number, usage: git review 1234"
         fi
