@@ -183,15 +183,35 @@ function git.prune.pr() {
       echo "Checking $dir"
 
       cd "$dir"
-      pr_status=$(gh pr status 2>&1)
 
-      if echo "$pr_status" | grep -A 1 "Current branch" | grep -q "Merged"; then
-        echo "  PR is merged. Deleting directory..."
+      # check for uncommitted changes
+      if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        echo "  Has uncommitted changes. Skipping."
         cd ..
-        git.delete.branch "$dir"
+        continue
+      fi
+
+      # check if there's a remote tracking branch
+      local remote_branch=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+
+      if [ -z "$remote_branch" ]; then
+        echo "  No remote tracking branch. Skipping."
+        cd ..
+        continue
       else
-        echo "  PR is not merged"
-        cd ..
+        # check if local is in sync with remote
+        git fetch --quiet 2>/dev/null
+        local local_rev=$(git rev-parse HEAD 2>/dev/null)
+        local remote_rev=$(git rev-parse @{upstream} 2>/dev/null)
+
+        if [ "$local_rev" = "$remote_rev" ]; then
+          echo "  In sync with remote. Deleting..."
+          cd ..
+          git.delete.branch "$dir"
+        else
+          echo "  Local differs from remote. Skipping."
+          cd ..
+        fi
       fi
     fi
   done
