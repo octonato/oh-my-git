@@ -224,11 +224,12 @@ function git.worktree.remove {
     if [ -d .git ]; then
       if [ $1 ]; then
           WORKTREE_PATH="$1"
-          DIR_NAME="${WORKTREE_PATH##*/}"
-          BRANCH_NAME="${GH_USER_PREFIX}${DIR_NAME}"
+          BRANCH_NAME=$(git -C "$WORKTREE_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null)
 
           git worktree remove "$WORKTREE_PATH"
-          git branch -D "$BRANCH_NAME"
+          if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
+            git branch -D "$BRANCH_NAME"
+          fi
         else
           echo "path must be passed, usage: git.worktree.remove ../some-name"
         fi
