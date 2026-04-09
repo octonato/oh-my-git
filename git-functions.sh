@@ -66,7 +66,9 @@ function git.review {
     if [ -d .git ]; then
       if [ $1 ]; then
           local PR_NUMBER=$1
-          local WORKTREE_PATH="../pr-review-$PR_NUMBER"
+          local BRANCH_NAME=$(gh pr view "$PR_NUMBER" --json headRefName --jq '.headRefName')
+          local DIR_NAME="${BRANCH_NAME##*/}"
+          local WORKTREE_PATH="../$DIR_NAME"
 
           git worktree add "$WORKTREE_PATH" --detach
           cd "$WORKTREE_PATH"
