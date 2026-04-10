@@ -111,6 +111,7 @@ function ghp() {
     echo "  -v,  --view-browser Open in browser"
     echo "  -d,  --delete       Remove directory"
     echo "  -pl, --pr-list      List PRs"
+    echo "  -m,  --merge        Merge PR if approved (prompts for merge or squash)"
     echo "  -h,  --help         Show this help"
     echo "  -cl, --claude       Open Claude in project"
     echo "  -l,  --list         List directory contents"
@@ -222,6 +223,32 @@ function ghp() {
               fi
             )
             ;;
+          -m|--merge)
+            shift
+            (
+              cd $PROJ_DIR
+              decision=$(gh pr view --json reviewDecision -q .reviewDecision 2>/dev/null)
+              if [[ "$decision" != "APPROVED" ]]; then
+                echo "PR is not approved (reviewDecision: ${decision:-none}). Aborting."
+              else
+                echo "PR is approved."
+                printf "Merge type? [m]erge / [s]quash / [c]ancel: "
+                read -r -k 1 choice
+                echo ""
+                case "$choice" in
+                  m|M)
+                    gh pr merge --merge
+                    ;;
+                  s|S)
+                    gh pr merge --squash
+                    ;;
+                  *)
+                    echo "Cancelled."
+                    ;;
+                esac
+              fi
+            )
+            ;;
           -h|--help)
             shift
             usage.ghp
@@ -281,6 +308,8 @@ _ghp_completions() {
       "--delete[Remove directory]" \
       "-pl[List PRs]" \
       "--pr-list[List PRs]" \
+      "-m[Merge PR if approved]" \
+      "--merge[Merge PR if approved]" \
       "-g[Go to directory]" \
       "--go-to[Go to directory]" \
       "-h[Show help]" \
