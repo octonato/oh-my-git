@@ -4,6 +4,23 @@
 # Deletes a directory only if it has no uncommitted changes and is in sync with its remote.
 # Skips directories with no remote tracking branch (no backup).
 # Must be run from the parent directory containing the worktrees/branches.
+#
+# Pass --dry-run (or -n) to preview deletions without removing anything.
+
+DRY_RUN=0
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run|-n) DRY_RUN=1 ;;
+    *) 
+      echo "Unknown argument: $arg" >&2; 
+      echo "Expected arguments are --dry-run or -n" 
+      exit 1 ;;
+  esac
+done
+
+if [ "$DRY_RUN" = "1" ]; then
+  echo "Dry run: no branches or worktrees will be deleted."
+fi
 
 for dir in */; do
   dir_name="${dir%/}"
@@ -39,21 +56,36 @@ for dir in */; do
       continue
     fi
 
-    echo "  In sync with remote. Deleting..."
+    if [ "$DRY_RUN" = "1" ]; then
+      echo "  In sync with remote. Would delete (dry-run)."
+    else
+      echo "  In sync with remote. Deleting..."
+    fi
 
     if [ -f "$dir/.git" ]; then
       # It's a worktree — remove via git worktree from the main worktree
       WORKTREE_NAME=$(basename "$dir")
       BRANCH_NAME=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
-      (
-        cd main
-        git worktree remove --force "../$WORKTREE_NAME"
+      if [ "$DRY_RUN" = "1" ]; then
+        echo "  Would remove worktree: ../$WORKTREE_NAME"
         if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
-          git branch -D "$BRANCH_NAME"
+          echo "  Would delete branch: $BRANCH_NAME"
         fi
-      )
+      else
+        (
+          cd main
+          git worktree remove --force "../$WORKTREE_NAME"
+          if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
+            git branch -D "$BRANCH_NAME"
+          fi
+        )
+      fi
     else
-      rm -rf "$dir"
+      if [ "$DRY_RUN" = "1" ]; then
+        echo "  Would remove directory: $dir"
+      else
+        rm -rf "$dir"
+      fi
     fi
   fi
 done
