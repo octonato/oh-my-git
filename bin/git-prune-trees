@@ -7,6 +7,20 @@
 #
 # Pass --dry-run (or -n) to preview deletions without removing anything.
 
+# ANSI colors (disabled if stdout is not a terminal)
+if [ -t 1 ]; then
+  BOLD=$(printf '\033[1m')
+  RED=$(printf '\033[31m')
+  GREEN=$(printf '\033[32m')
+  YELLOW=$(printf '\033[33m')
+  BLUE=$(printf '\033[34m')
+  CYAN=$(printf '\033[36m')
+  DIM=$(printf '\033[2m')
+  RESET=$(printf '\033[0m')
+else
+  BOLD=""; RED=""; GREEN=""; YELLOW=""; BLUE=""; CYAN=""; DIM=""; RESET=""
+fi
+
 DRY_RUN=0
 for arg in "$@"; do
   case "$arg" in
@@ -19,7 +33,7 @@ for arg in "$@"; do
 done
 
 if [ "$DRY_RUN" = "1" ]; then
-  echo "Dry run: no branches or worktrees will be deleted."
+  echo "${BOLD}${CYAN}Dry run:${RESET} no branches or worktrees will be deleted."
 fi
 
 for dir in */; do
@@ -29,12 +43,12 @@ for dir in */; do
   fi
 
   if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-    echo "\n--------------------------------------------------------------"
-    echo "Checking $dir_name"
+    echo "\n${DIM}--------------------------------------------------------------${RESET}"
+    echo "${BOLD}Checking${RESET} $dir_name"
 
     # check for uncommitted changes
     if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
-      echo "  Has uncommitted changes. Skipping."
+      echo "  Has uncommitted changes. ${YELLOW}${BOLD}Skipping.${RESET}"
       continue
     fi
 
@@ -42,7 +56,7 @@ for dir in */; do
     remote_branch=$(git -C "$dir" rev-parse --abbrev-ref @{upstream} 2>/dev/null)
 
     if [ -z "$remote_branch" ]; then
-      echo "  No remote tracking branch. Skipping."
+      echo "  No remote tracking branch. ${YELLOW}${BOLD}Skipping.${RESET}"
       continue
     fi
 
@@ -52,14 +66,14 @@ for dir in */; do
     remote_rev=$(git -C "$dir" rev-parse @{upstream} 2>/dev/null)
 
     if [ "$local_rev" != "$remote_rev" ]; then
-      echo "  Local differs from remote. Skipping."
+      echo "  Local differs from remote. ${YELLOW}${BOLD}Skipping.${RESET}"
       continue
     fi
 
     if [ "$DRY_RUN" = "1" ]; then
-      echo "  In sync with remote. Would delete (dry-run)."
+      echo "  In sync with remote. ${CYAN}${BOLD}Would delete${RESET} (dry-run)."
     else
-      echo "  In sync with remote. Deleting..."
+      echo "  In sync with remote. ${RED}${BOLD}Deleting...${RESET}"
     fi
 
     if [ -f "$dir/.git" ]; then
@@ -67,9 +81,9 @@ for dir in */; do
       WORKTREE_NAME=$(basename "$dir")
       BRANCH_NAME=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
       if [ "$DRY_RUN" = "1" ]; then
-        echo "  Would remove worktree: ../$WORKTREE_NAME"
+        echo "  ${CYAN}${BOLD}Would remove worktree:${RESET} ../$WORKTREE_NAME"
         if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
-          echo "  Would delete branch: $BRANCH_NAME"
+          echo "  ${CYAN}${BOLD}Would delete branch:${RESET} $BRANCH_NAME"
         fi
       else
         (
@@ -82,7 +96,7 @@ for dir in */; do
       fi
     else
       if [ "$DRY_RUN" = "1" ]; then
-        echo "  Would remove directory: $dir"
+        echo "  ${CYAN}${BOLD}Would remove directory:${RESET} $dir"
       else
         rm -rf "$dir"
       fi
