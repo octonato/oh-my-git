@@ -98,23 +98,25 @@ function ghp() {
 
   function usage.ghp() {
     echo "Usage: ghp <hash-path> [options]"
-    echo "       ghp                  Show recent projects"
+    echo "       ghp                 Show recent projects"
     echo "Options:"
-    echo "  -e,  --edit         Open in default editor (${EDITOR})"
-    echo "  -n,  --nvim         Open in nvim"
-    echo "  -i,  --intellij     Open in IntelliJ"
-    echo "  -g,  --git          Open in Lazygit"
-    echo "  -c,  --command      Run command in directory"
-    echo "  -t,  --worktree     Switch to branch using git worktree. A new worktree will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
-    echo "  -r,  --review       Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>."
-    echo "  -s,  --status       Show PR status"
-    echo "  -v,  --view-browser Open in browser"
-    echo "  -d,  --delete       Remove directory"
-    echo "  -pl, --pr-list      List PRs"
-    echo "  -m,  --merge        Merge PR if approved (prompts for merge or squash)"
-    echo "  -h,  --help         Show this help"
-    echo "  -cl, --claude       Open Claude in project"
-    echo "  -l,  --list         List directory contents"
+    echo "  -e,  --edit              Open in default editor (${EDITOR})"
+    echo "  -n,  --nvim              Open in nvim"
+    echo "  -i,  --intellij          Open in IntelliJ"
+    echo "  -g,  --git               Open in Lazygit"
+    echo "  -c,  --command           Run command in directory"
+    echo "  -t,  --worktree          Switch to branch using git worktree. A new worktree will be created in ../<branch-name> and called ${GH_USER_PREFIX}<branch-name>."
+    echo "  -r,  --review            Review PR. Use -r <pr-number> to review a specific PR. A new branch will be created in ../pr-review-<pr-number>."
+    echo "  -s,  --status            Show PR status"
+    echo "  -v,  --view-browser      Open in browser"
+    echo "  -d,  --delete            Remove directory"
+    echo "  -pl, --pr-list           List PRs"
+    echo "  -m,  --merge             Merge PR if approved (prompts for merge or squash)"
+    echo "  -p,  --prune             Prune worktrees in the parent directory (git-prune-trees)"
+    echo "  -pn, --prune-dry-run     Preview prune without deleting"
+    echo "  -h,  --help              Show this help"
+    echo "  -cl, --claude            Open Claude in project"
+    echo "  -l,  --list              List directory contents"
   }
 
   if [[ $# -eq 0 ]]; then
@@ -223,6 +225,14 @@ function ghp() {
               fi
             )
             ;;
+          -p|--prune)
+            shift
+            git-prune-trees "${PROJ_DIR:h}"
+            ;;
+          -pn|--prune-dry-run)
+            shift
+            git-prune-trees -n "${PROJ_DIR:h}"
+            ;;
           -m|--merge)
             shift
             (
@@ -310,6 +320,10 @@ _ghp_completions() {
       "--pr-list[List PRs]" \
       "-m[Merge PR if approved]" \
       "--merge[Merge PR if approved]" \
+      "-p[Prune worktrees in parent directory]" \
+      "--prune[Prune worktrees in parent directory]" \
+      "-pn[Preview prune (dry run)]" \
+      "--prune-dry-run[Preview prune (dry run)]" \
       "-g[Go to directory]" \
       "--go-to[Go to directory]" \
       "-h[Show help]" \

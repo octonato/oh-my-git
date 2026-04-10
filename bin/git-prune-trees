@@ -3,7 +3,8 @@
 # Prune worktree/branch directories that are safely backed up to remote.
 # Deletes a directory only if it has no uncommitted changes and is in sync with its remote.
 # Skips directories with no remote tracking branch (no backup).
-# Must be run from the parent directory containing the worktrees/branches.
+# Must be run from the parent directory containing the worktrees/branches,
+# or pass that directory as an argument.
 #
 # Pass --dry-run (or -n) to preview deletions without removing anything.
 
@@ -22,19 +23,71 @@ else
 fi
 
 DRY_RUN=0
+TARGET_DIR=""
 for arg in "$@"; do
   case "$arg" in
     --dry-run|-n) DRY_RUN=1 ;;
-    *) 
-      echo "Unknown argument: $arg" >&2; 
-      echo "Expected arguments are --dry-run or -n" 
+    -*)
+      echo "Unknown argument: $arg" >&2;
+      echo "Expected arguments are --dry-run or -n, optionally followed by a directory"
       exit 1 ;;
+    *)
+      if [ -n "$TARGET_DIR" ]; then
+        echo "Only one directory argument is allowed" >&2
+        exit 1
+      fi
+      TARGET_DIR="$arg" ;;
   esac
 done
+
+if [ -n "$TARGET_DIR" ]; then
+  if [ ! -d "$TARGET_DIR" ]; then
+    echo "Not a directory: $TARGET_DIR" >&2
+    exit 1
+  fi
+  cd "$TARGET_DIR" || exit 1
+fi
 
 if [ "$DRY_RUN" = "1" ]; then
   echo "${BOLD}${CYAN}Dry run:${RESET} no branches or worktrees will be deleted."
 fi
+
+# Print PR status for a directory's current branch (dry-run only).
+show_pr_status() {
+  _dir="$1"
+  [ "$DRY_RUN" = "1" ] || return 0
+  command -v gh >/dev/null 2>&1 || return 0
+
+  _branch=$(git -C "$_dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  [ -n "$_branch" ] && [ "$_branch" != "HEAD" ] || return 0
+
+  _pr_info=$(cd "$_dir" && gh pr list \
+    --head "$_branch" --state all \
+    --json number,state,reviewDecision,title \
+    --jq '.[0] | "\(.number)\t\(.state)\t\(.reviewDecision // "NONE")\t\(.title)"' 2>/dev/null)
+
+  if [ -n "$_pr_info" ]; then
+    _pr_num=$(echo "$_pr_info" | cut -f1)
+    _pr_state=$(echo "$_pr_info" | cut -f2)
+    _pr_review=$(echo "$_pr_info" | cut -f3)
+    _pr_title=$(echo "$_pr_info" | cut -f4)
+    case "$_pr_state" in
+      MERGED) _state_color="${GREEN}${BOLD}" ;;
+      CLOSED) _state_color="${DIM}${BOLD}" ;;
+      OPEN)   _state_color="${BLUE}${BOLD}" ;;
+      *)      _state_color="${BOLD}" ;;
+    esac
+    case "$_pr_review" in
+      APPROVED)          _review_color="${GREEN}${BOLD}" ;;
+      CHANGES_REQUESTED) _review_color="${RED}${BOLD}" ;;
+      REVIEW_REQUIRED)   _review_color="${YELLOW}${BOLD}" ;;
+      *)                 _review_color="${DIM}" ;;
+    esac
+    echo "  PR ${BOLD}#${_pr_num}${RESET} ${_state_color}${_pr_state}${RESET} / review: ${_review_color}${_pr_review}${RESET} — ${DIM}${_pr_title}${RESET}"
+  else
+    echo "  ${DIM}No PR found for branch ${_branch}${RESET}"
+  fi
+}
 
 for dir in */; do
   dir_name="${dir%/}"
@@ -49,6 +102,7 @@ for dir in */; do
     # check for uncommitted changes
     if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
       echo "  Has uncommitted changes. ${YELLOW}${BOLD}Skipping.${RESET}"
+      show_pr_status "$dir"
       continue
     fi
 
@@ -57,6 +111,7 @@ for dir in */; do
 
     if [ -z "$remote_branch" ]; then
       echo "  No remote tracking branch. ${YELLOW}${BOLD}Skipping.${RESET}"
+      show_pr_status "$dir"
       continue
     fi
 
@@ -67,11 +122,13 @@ for dir in */; do
 
     if [ "$local_rev" != "$remote_rev" ]; then
       echo "  Local differs from remote. ${YELLOW}${BOLD}Skipping.${RESET}"
+      show_pr_status "$dir"
       continue
     fi
 
     if [ "$DRY_RUN" = "1" ]; then
       echo "  In sync with remote. ${CYAN}${BOLD}Would delete${RESET} (dry-run)."
+      show_pr_status "$dir"
     else
       echo "  In sync with remote. ${RED}${BOLD}Deleting...${RESET}"
     fi
