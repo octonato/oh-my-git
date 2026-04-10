@@ -171,53 +171,55 @@ function grum {
 }
 
 
-function git.prune.pr() {
-  for dir in */; do
-    dir_name="${dir%/}"
-    if [ "$dir_name" = "main" ]; then
-      continue
-    fi
-
-    if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
-      echo "\n--------------------------------------------------------------"
-      echo "Checking $dir"
-
-      cd "$dir"
-
-      # check for uncommitted changes
-      if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-        echo "  Has uncommitted changes. Skipping."
-        cd ..
-        continue
-      fi
-
-      # check if there's a remote tracking branch
-      local remote_branch=$(git rev-parse --abbrev-ref @{upstream} 2>/dev/null)
-
-      if [ -z "$remote_branch" ]; then
-        echo "  No remote tracking branch. Skipping."
-        cd ..
-        continue
-      else
-        # check if local is in sync with remote
-        git fetch --quiet 2>/dev/null
-        local local_rev=$(git rev-parse HEAD 2>/dev/null)
-        local remote_rev=$(git rev-parse @{upstream} 2>/dev/null)
-
-        if [ "$local_rev" = "$remote_rev" ]; then
-          echo "  In sync with remote. Deleting..."
-          cd ..
-          git.delete.branch "$dir"
-        else
-          echo "  Local differs from remote. Skipping."
-          cd ..
-        fi
-      fi
-    fi
-  done
-}
 
 # delete a branch directory, handling both worktrees and hard forks
+# Check a git directory for potential data loss.
+# Returns warnings via stdout. Empty output means safe to delete.
+# Used by git.delete.branch and git.worktree.remove
+# — if changed here, review both callers.
+function _git.check.data.loss {
+    local dir="$1"
+    local warnings=""
+
+    if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
+      warnings="${warnings}  - Has uncommitted/unstaged changes\n"
+    fi
+
+    local remote_branch=$(git -C "$dir" rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+    if [ -z "$remote_branch" ]; then
+      warnings="${warnings}  - No remote tracking branch (no backup)\n"
+    else
+      git -C "$dir" fetch --quiet 2>/dev/null
+      local local_rev=$(git -C "$dir" rev-parse HEAD 2>/dev/null)
+      local remote_rev=$(git -C "$dir" rev-parse @{upstream} 2>/dev/null)
+      if [ "$local_rev" != "$remote_rev" ]; then
+        warnings="${warnings}  - Local differs from remote (unpushed commits)\n"
+      fi
+    fi
+
+    echo "$warnings"
+}
+
+# Prompt user if there are data loss warnings. Returns 0 if safe to proceed, 1 if aborted.
+# Used by git.delete.branch and git.worktree.remove
+# — if changed here, review both callers.
+function _git.confirm.data.loss {
+    local dir="$1"
+    local warnings=$(_git.check.data.loss "$dir")
+
+    if [ -n "$warnings" ]; then
+      echo "Warning: potential data loss in $dir:"
+      echo "$warnings"
+      echo -n "Continue? (y/N) "
+      read -r confirm
+      if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+        echo "Aborted."
+        return 1
+      fi
+    fi
+    return 0
+}
+
 function git.delete.branch {
     local dir="$1"
     if [ ! -d "$dir" ]; then
@@ -235,6 +237,7 @@ function git.delete.branch {
         gtr "../$WORKTREE_NAME"
       )
     else
+      _git.confirm.data.loss "$dir" || return 0
       echo "Removing $dir"
       rm -rf "$dir"
     fi
@@ -248,7 +251,9 @@ function git.worktree.remove {
           WORKTREE_PATH="$1"
           BRANCH_NAME=$(git -C "$WORKTREE_PATH" rev-parse --abbrev-ref HEAD 2>/dev/null)
 
-          git worktree remove "$WORKTREE_PATH"
+          _git.confirm.data.loss "$WORKTREE_PATH" || return 0
+
+          git worktree remove --force "$WORKTREE_PATH"
           if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
             git branch -D "$BRANCH_NAME"
           fi

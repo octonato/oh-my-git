@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# Prune worktree/branch directories that are safely backed up to remote.
+# Deletes a directory only if it has no uncommitted changes and is in sync with its remote.
+# Skips directories with no remote tracking branch (no backup).
+# Must be run from the parent directory containing the worktrees/branches.
+
+for dir in */; do
+  dir_name="${dir%/}"
+  if [ "$dir_name" = "main" ]; then
+    continue
+  fi
+
+  if [ -d "$dir/.git" ] || [ -f "$dir/.git" ]; then
+    echo "\n--------------------------------------------------------------"
+    echo "Checking $dir_name"
+
+    # check for uncommitted changes
+    if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
+      echo "  Has uncommitted changes. Skipping."
+      continue
+    fi
+
+    # check if there's a remote tracking branch
+    remote_branch=$(git -C "$dir" rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+
+    if [ -z "$remote_branch" ]; then
+      echo "  No remote tracking branch. Skipping."
+      continue
+    fi
+
+    # check if local is in sync with remote
+    git -C "$dir" fetch --quiet 2>/dev/null
+    local_rev=$(git -C "$dir" rev-parse HEAD 2>/dev/null)
+    remote_rev=$(git -C "$dir" rev-parse @{upstream} 2>/dev/null)
+
+    if [ "$local_rev" != "$remote_rev" ]; then
+      echo "  Local differs from remote. Skipping."
+      continue
+    fi
+
+    echo "  In sync with remote. Deleting..."
+
+    if [ -f "$dir/.git" ]; then
+      # It's a worktree — remove via git worktree from the main worktree
+      WORKTREE_NAME=$(basename "$dir")
+      BRANCH_NAME=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)
+      (
+        cd main
+        git worktree remove --force "../$WORKTREE_NAME"
+        if [ "$BRANCH_NAME" != "HEAD" ] && [ -n "$BRANCH_NAME" ]; then
+          git branch -D "$BRANCH_NAME"
+        fi
+      )
+    else
+      rm -rf "$dir"
+    fi
+  fi
+done
