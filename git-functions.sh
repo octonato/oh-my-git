@@ -38,16 +38,40 @@ alias gri=git.rebase.interactive
 # create a working branch using git worktree
 # If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch,
 # eg: GH_USER_PREFIX=wip- results in wip-{chosen-branch-name}
+# Pass -p / --pull to automatically pull from upstream without prompting.
 function git.worktree {
     if [ -d .git ]; then
-      if [ $1 ]; then
-          BASE_BRANCH=`git-current-branch`
-          WORKTREE_PATH="../${1}"
+      local AUTO_PULL=false
+      local POSITIONAL=()
+      for arg in "$@"; do
+        case "$arg" in
+          -p|--pull)
+            AUTO_PULL=true
+            ;;
+          *)
+            POSITIONAL+=("$arg")
+            ;;
+        esac
+      done
 
-          git worktree add -b ${GH_USER_PREFIX}${1} "$WORKTREE_PATH"
+      if [ ${POSITIONAL[1]} ]; then
+          BASE_BRANCH=`git-current-branch`
+          local NAME="${POSITIONAL[1]}"
+          if [[ "$NAME" == */* ]]; then
+            WORKTREE_PATH="$NAME"
+          else
+            WORKTREE_PATH="../${NAME}"
+          fi
+          BRANCH_NAME=$(basename "$NAME")
+
+          git worktree add -b ${GH_USER_PREFIX}${BRANCH_NAME} "$WORKTREE_PATH"
           cd "$WORKTREE_PATH"
 
-          read "reply?Pull upstream [upstream/$BASE_BRANCH]? [Y/n] "
+          if [[ "$AUTO_PULL" == true ]]; then
+            reply="y"
+          else
+            read "reply?Pull upstream [upstream/$BASE_BRANCH]? [Y/n] "
+          fi
           if [[ "$reply" =~ ^[Nn]$ ]]; then
             echo "Skipping pull upstream."
           else
@@ -55,7 +79,7 @@ function git.worktree {
             git pull upstream $BASE_BRANCH
           fi
         else
-          echo "branch name must be passed, usage: git worktree some-name"
+          echo "branch name must be passed, usage: git.worktree [-p|--pull] some-name"
         fi
     else
       echo "Not a git repository"
@@ -234,7 +258,7 @@ function git.delete.branch {
       echo "Removing worktree $WORKTREE_NAME"
       (
         cd "$MAIN_DIR"
-        gtr "../$WORKTREE_NAME"
+        git.worktree.remove "../$WORKTREE_NAME"
       )
     else
       _git.confirm.data.loss "$dir" || return 0
