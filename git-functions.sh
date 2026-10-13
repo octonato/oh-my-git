@@ -253,12 +253,12 @@ function git.delete.branch {
 
     if [ -f "$dir/.git" ]; then
       # It's a worktree, remove it properly via gtr from the main worktree
-      local WORKTREE_NAME=$(basename "$dir")
+      local WORKTREE_PATH=$(git -C "$dir" rev-parse --show-toplevel)
       local MAIN_DIR=$(git -C "$dir" worktree list --porcelain | head -1 | sed 's/^worktree //')
-      echo "Removing worktree $WORKTREE_NAME"
+      echo "Removing worktree $(basename "$WORKTREE_PATH")"
       (
         cd "$MAIN_DIR"
-        git.worktree.remove "../$WORKTREE_NAME"
+        git.worktree.remove "$WORKTREE_PATH"
       )
     else
       _git.confirm.data.loss "$dir" || return 0
