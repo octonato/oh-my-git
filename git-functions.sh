@@ -23,11 +23,20 @@ function git.rebase.interactive {
   if [ $1 ]; then
     if [[ $1 =~ ^[0-9]+$ ]]; then
       git rebase -i HEAD~"$1"
+
+    elif [[ $1 =~ ^[0-9a-f]{4,40}$ ]] && ! git show-ref --quiet "$1" && git rev-parse --verify --quiet "$1^{commit}" > /dev/null; then
+      # commit hash: rebase from this commit (inclusive) up to HEAD
+      if git rev-parse --verify --quiet "$1^" > /dev/null; then
+        git rebase -i "$1^"
+      else
+        git rebase -i --root
+      fi
+
     else
       git rebase -i "$1"
     fi
   else
-    echo "A HEAD~{num} or branch name must be provided"
+    echo "A HEAD~{num}, commit hash or branch name must be provided"
     echo
     git recent
   fi
