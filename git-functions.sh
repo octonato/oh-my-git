@@ -44,6 +44,184 @@ function git.rebase.interactive {
 
 alias gri=git.rebase.interactive
 
+# show files changed and lines added/removed from main, or from a commit (inclusive), to HEAD
+# Pass --all to also show the stats of each commit.
+function git.diff.stat {
+  local SHOW_COMMITS=false
+  local COMMIT=""
+  local arg
+  for arg in "$@"; do
+    if [[ "$arg" == --all || "$arg" == -a ]]; then
+      SHOW_COMMITS=true
+    elif [[ "$arg" == -* ]]; then
+      echo "Unknown option: $arg, usage: git.diff.stat [-a|--all] [commit]"
+      return 1
+    elif [[ -z "$COMMIT" ]]; then
+      COMMIT="$arg"
+    else
+      echo "Only one commit may be passed, usage: git.diff.stat [-a|--all] [commit]"
+      return 1
+    fi
+  done
+
+  local EMPTY_TREE=$(git hash-object -t tree /dev/null)
+  local FROM=""
+  local RANGE=""
+
+  if [ -n "$COMMIT" ]; then
+    if ! git rev-parse --verify --quiet "$COMMIT^{commit}" > /dev/null; then
+      echo "Not a commit: $COMMIT, usage: git.diff.stat [--all] [commit]"
+      return 1
+    fi
+
+    if git rev-parse --verify --quiet "$COMMIT^" > /dev/null; then
+      FROM="$COMMIT^"
+      RANGE="$COMMIT^..HEAD"
+    else
+      FROM="$EMPTY_TREE"
+      RANGE="HEAD"
+    fi
+
+  else
+    local BASE=""
+    local candidate
+    for candidate in upstream/main origin/main main upstream/master origin/master master; do
+      if git rev-parse --verify --quiet "$candidate^{commit}" > /dev/null; then
+        BASE="$candidate"
+        break
+      fi
+    done
+
+    if [ -z "$BASE" ]; then
+      echo "No main branch found, usage: git.diff.stat [--all] [commit]"
+      return 1
+    fi
+
+    FROM=$(git merge-base "$BASE" HEAD)
+    if [ -z "$FROM" ]; then
+      echo "HEAD has no common ancestor with $BASE"
+      return 1
+    fi
+
+    RANGE="$FROM..HEAD"
+    echo "Comparing with $BASE"
+  fi
+
+  if [[ "$SHOW_COMMITS" == true ]]; then
+    local BOLD="" RESET=""
+    if [ -t 1 ]; then
+      BOLD=$'\033[1m' RESET=$'\033[0m'
+    fi
+
+    echo
+    echo "${BOLD}Total${RESET}"
+  fi
+
+  _git.print.diff.stat "$FROM" HEAD
+
+  if [[ "$SHOW_COMMITS" == true ]]; then
+    echo
+    local c
+    for c in $(git rev-list "$RANGE"); do
+      echo
+      git --no-pager log -1 --format='%C(bold)%s%C(reset)%n%C(yellow)%H%C(reset)' "$c"
+
+      if git rev-parse --verify --quiet "$c^" > /dev/null; then
+        _git.print.diff.stat "$c^" "$c"
+      else
+        _git.print.diff.stat "$EMPTY_TREE" "$c"
+      fi
+    done
+  fi
+}
+
+# print files changed, insertions and deletions for the given git diff arguments, one per line
+function _git.print.diff.stat {
+  local STAT=$(git --no-pager diff --shortstat "$@")
+
+  local FILES=$(echo "$STAT" | grep -oE '[0-9]+ files? changed' | grep -oE '[0-9]+')
+  local INSERTIONS=$(echo "$STAT" | grep -oE '[0-9]+ insertions?' | grep -oE '[0-9]+')
+  local DELETIONS=$(echo "$STAT" | grep -oE '[0-9]+ deletions?' | grep -oE '[0-9]+')
+
+  local GREEN="" RED="" RESET=""
+  if [ -t 1 ]; then
+    GREEN=$'\033[32m' RED=$'\033[31m' RESET=$'\033[0m'
+  fi
+
+  echo "Files changed: ${FILES:-0}"
+  echo "Insertions:    ${GREEN}+${INSERTIONS:-0}${RESET}"
+  echo "Deletions:     ${RED}-${DELETIONS:-0}${RESET}"
+}
+
+alias gdst=git.diff.stat
+
+# squash-merge a branch into the current branch, reusing the message and author of its first commit
+# Pass -d to delete the local source branch after a successful commit.
+function git.merge.squash {
+  local DELETE_BRANCH=false
+  local BRANCH=""
+  local arg
+  local PARSE_OPTIONS=true
+  for arg in "$@"; do
+    if [[ "$PARSE_OPTIONS" == true && "$arg" == -d ]]; then
+      DELETE_BRANCH=true
+    elif [[ "$PARSE_OPTIONS" == true && "$arg" == -- ]]; then
+      PARSE_OPTIONS=false
+    elif [[ "$PARSE_OPTIONS" == true && "$arg" == -* ]]; then
+      echo "Unknown option: $arg, usage: git.merge.squash [-d] some-branch"
+      return 1
+    elif [[ -z "$BRANCH" ]]; then
+      BRANCH="$arg"
+    else
+      echo "Only one branch may be passed, usage: git.merge.squash [-d] some-branch"
+      return 1
+    fi
+  done
+
+  if [ -z "$BRANCH" ]; then
+    echo "branch name must be passed, usage: git.merge.squash [-d] some-branch"
+    return 1
+  fi
+
+  local FIRST_COMMIT=$(git rev-list --reverse HEAD.."$BRANCH" | head -1)
+
+  if [ -z "$FIRST_COMMIT" ]; then
+    echo "Nothing to merge from $BRANCH"
+    return 1
+  fi
+
+  if ! git merge --squash "$BRANCH"; then
+    echo
+    echo "Resolve the conflicts, then run: git commit -C $FIRST_COMMIT --date=now"
+    return 1
+  fi
+
+  git commit -C "$FIRST_COMMIT" --date=now || return $?
+
+  if [[ "$DELETE_BRANCH" == true ]]; then
+    # Squash commits do not record merge ancestry, so branch -d would reject this.
+    git branch -D -- "$BRANCH"
+  fi
+}
+
+alias gms=git.merge.squash
+
+_git_merge_squash_completions() {
+  _arguments \
+    '-d[Delete the local source branch after a successful squash commit]' \
+    '1:branch:_git_merge_squash_branches'
+}
+
+_git_merge_squash_branches() {
+  local -a branches
+  branches=("${(@f)$(git for-each-ref --format='%(refname:short)' refs/heads refs/remotes 2>/dev/null)}")
+  _describe 'branch' branches
+}
+
+if (( $+functions[compdef] )); then
+  compdef _git_merge_squash_completions git.merge.squash gms
+fi
+
 # create a working branch using git worktree
 # If env variable 'GH_USER_PREFIX' is set, it's used as a prefix for the branch,
 # eg: GH_USER_PREFIX=wip- results in wip-{chosen-branch-name}
