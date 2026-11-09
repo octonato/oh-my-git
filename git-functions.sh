@@ -46,23 +46,38 @@ alias gri=git.rebase.interactive
 
 # show files changed and lines added/removed from main, or from a commit (inclusive), to HEAD
 # Pass --all to also show the stats of each commit.
+# Pass --only with a commit to show the stats of that commit alone.
 function git.diff.stat {
+  local USAGE="usage: git.diff.stat [-a|--all] [commit] | git.diff.stat -o|--only <commit>"
   local SHOW_COMMITS=false
+  local ONLY=false
   local COMMIT=""
   local arg
   for arg in "$@"; do
     if [[ "$arg" == --all || "$arg" == -a ]]; then
       SHOW_COMMITS=true
+    elif [[ "$arg" == --only || "$arg" == -o ]]; then
+      ONLY=true
     elif [[ "$arg" == -* ]]; then
-      echo "Unknown option: $arg, usage: git.diff.stat [-a|--all] [commit]"
+      echo "Unknown option: $arg, $USAGE"
       return 1
     elif [[ -z "$COMMIT" ]]; then
       COMMIT="$arg"
     else
-      echo "Only one commit may be passed, usage: git.diff.stat [-a|--all] [commit]"
+      echo "Only one commit may be passed, $USAGE"
       return 1
     fi
   done
+
+  if [[ "$ONLY" == true && "$SHOW_COMMITS" == true ]]; then
+    echo "Options --only and --all cannot be used together, $USAGE"
+    return 1
+  fi
+
+  if [[ "$ONLY" == true && -z "$COMMIT" ]]; then
+    echo "Option --only requires a commit, $USAGE"
+    return 1
+  fi
 
   local EMPTY_TREE=$(git hash-object -t tree /dev/null)
   local FROM=""
@@ -70,8 +85,13 @@ function git.diff.stat {
 
   if [ -n "$COMMIT" ]; then
     if ! git rev-parse --verify --quiet "$COMMIT^{commit}" > /dev/null; then
-      echo "Not a commit: $COMMIT, usage: git.diff.stat [--all] [commit]"
+      echo "Not a commit: $COMMIT, $USAGE"
       return 1
+    fi
+
+    if [[ "$ONLY" == true ]]; then
+      _git.print.commit.stat "$COMMIT"
+      return
     fi
 
     if git rev-parse --verify --quiet "$COMMIT^" > /dev/null; then
@@ -93,7 +113,7 @@ function git.diff.stat {
     done
 
     if [ -z "$BASE" ]; then
-      echo "No main branch found, usage: git.diff.stat [--all] [commit]"
+      echo "No main branch found, $USAGE"
       return 1
     fi
 
@@ -117,6 +137,7 @@ function git.diff.stat {
     echo "${BOLD}Total${RESET}"
   fi
 
+  echo "Commits:       $(git rev-list --count "$RANGE")"
   _git.print.diff.stat "$FROM" HEAD
 
   if [[ "$SHOW_COMMITS" == true ]]; then
@@ -124,14 +145,19 @@ function git.diff.stat {
     local c
     for c in $(git rev-list "$RANGE"); do
       echo
-      git --no-pager log -1 --format='%C(bold)%s%C(reset)%n%C(yellow)%H%C(reset)' "$c"
-
-      if git rev-parse --verify --quiet "$c^" > /dev/null; then
-        _git.print.diff.stat "$c^" "$c"
-      else
-        _git.print.diff.stat "$EMPTY_TREE" "$c"
-      fi
+      _git.print.commit.stat "$c"
     done
+  fi
+}
+
+# print the subject, hash and diff stat of a single commit
+function _git.print.commit.stat {
+  git --no-pager log -1 --format='%C(bold)%s%C(reset)%n%C(yellow)%H%C(reset)' "$1"
+
+  if git rev-parse --verify --quiet "$1^" > /dev/null; then
+    _git.print.diff.stat "$1^" "$1"
+  else
+    _git.print.diff.stat "$(git hash-object -t tree /dev/null)" "$1"
   fi
 }
 
